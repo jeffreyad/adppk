@@ -1,0 +1,528 @@
+---
+title: "Pharmacokinetic (PK) data programming in `{admiral}` and the Pharmaverse"
+subtitle: "R in Pharma 2023"
+author: "Jeff Dickinson, Navitas Data Sciences"
+format: 
+  revealjs: 
+    #incremental: true 
+    theme: dark
+    embed-resources: true
+editor: visual
+logo: ./images/Navitas.PNG
+---
+
+## Agenda
+
+-   What is PK data
+-   Types of PK analysis data
+-   Brief overview of `{admiral}` and the Pharmaverse
+-   Programming Workflow
+-   Some Additional Pharmaverse tools
+-   Pharmaverse Website Example
+
+::: notes
+Here's quick overview for today
+:::
+
+## Pharmacokinetics Overview
+
+![](images/PK_Schematic_Capture.PNG)
+
+-   Pharmacokinetics is the interaction of a drug with the body
+
+-   Samples collected at regular time intervals after dosing
+
+-   Metrics calculated from concentrations over time
+
+## Two Main Types of Modelling
+
+-   Non-Compartmental Analysis (NCA)
+
+-   Population PK (PopPK)
+
+## Non-Compartmental Analysis (NCA) -- `ADNCA/ADPC`
+
+-   Individual Based
+-   Intensive Sampling
+-   Derive Parameters e.g. `AUC`, `TMAX`, `CMAX`
+
+![](images/PK_curve.PNG){width="300"}
+
+## Population PK (PopPK) -- `ADPPK`
+
+-   Population Based
+-   Less Intensive Sampling
+-   Can Detect Variations based on Covariates
+
+## CDISC Standards for Non-Compartmental Analysis
+
+[![](./images/CDISC_ADNCA_ADaM_Capture.PNG){width="1000"}](https://www.cdisc.org/standards/foundational/adam/adamig-non-compartmental-analysis-input-data-v1-0)
+
+[https://www.cdisc.org/standards/foundational/adam/adamig-non-compartmental-analysis-input-data-v1-0](https://www.cdisc.org/standards/foundational/adam/adamig-non-compartmental-analysis-input-data-v1-0){target="_blank"}
+
+::: notes
+This CDISC guidance for non-compartmental analysis was published in November of 2021
+
+In using admiral for NCA data programming I have followed this guidance closely
+
+I will be using terms ADNCA and ADPC interchangeably
+:::
+
+## CDISC Standards for Population PK Analysis
+
+[![](./images/CDISC_ADPPK_ADaM_Capture.PNG){width="1000"}](https://www.cdisc.org/standards/foundational/adam/basic-data-structure-adam-poppk-implementation-guide-v1-0)
+
+Published October 6, 2023!
+
+[https://www.cdisc.org/standards/foundational/adam/basic-data-structure-adam-poppk-implementation-guide-v1-0](https://www.cdisc.org/standards/foundational/adam/basic-data-structure-adam-poppk-implementation-guide-v1-0){target="_blank"}
+
+## CDISC ADaM PK Standards
+
+-   `ADNCA` (NCA) -- released November 2021
+-   `ADPPK` (PopPK) -- released October 2023
+-   `ADPP` (PK Parameters) -- coming in 2024
+
+## Characteristics of PK Analysis Data
+
+-   Includes both exposure (`EX`) and concentration data (`PC`)
+-   Includes nominal and actual relative time variables
+-   Duplicated Records for Analysis (`ADNCA`)
+-   Numeric Covariates for Modelling (`ADPPK`)
+-   May need to expand dosing records
+
+## Important Components of `ADNCA` datasets
+
+-   Inclusion of Both PK Concentration records `PC` and Dosing Records `EX`
+-   Timing Variables for Nominal and Actual Time
+-   Duplicated Records for Analysis
+-   Exclusion Flags
+
+Note: I will be using terms `ADNCA` and `ADPC` interchangeably
+
+## Time Variables (`ADNCA`)
+
+| Variable | Variable Label                         |
+|----------|----------------------------------------|
+| `NFRLT`  | Nom. Rel. Time from Analyte First Dose |
+| `AFRLT`  | Act. Rel. Time from Analyte First Dose |
+| `NRRLT`  | Nominal Rel. Time from Ref. Dose       |
+| `ARRLT`  | Actual Rel. Time from Ref. Dose        |
+| `MRRLT`  | Modified Rel. Time from Ref. Dose      |
+
+Note: a relative time variable may refer to previous dose or next dose
+
+::: notes
+Here is a list of important nominal and actual relative time variables
+
+Timing Variables may refer to previous dose or next dose
+
+Actual times may be used to calculate parameters Nominal times may be used to group output in tables
+:::
+
+## Duplicated Records for Analysis
+
+-   Use One Record in More than One Way
+-   Record may be both "24 Hour Post-Dose" and "Pre-Dose"
+-   Relative Times for "Pre-Dose" will be Negative
+-   Create `DTYPE` = "COPY" Records
+-   Original `PCSEQ` is Retained
+
+::: notes
+Here is an overview of duplicated records for analysis
+:::
+
+## Time Variables (`ADPPK`)
+
+| Variable | Variable Label                      |
+|----------|-------------------------------------|
+| `NFRLT`  | Nominal Rel Time from First Dose    |
+| `AFRLT`  | Actual Rel Time from First Dose     |
+| `NPRLT`  | Nominal Rel Time from Previous Dose |
+| `APRLT`  | Actual Rel Time from Previous Dose  |
+
+![](images/Time_grid.png)
+
+## Time Variables Example
+
+| `USUBJID` | `EVID` | `NFRLT` | `AFRLT` | `NPRLT` | `ARRLT` |
+|-----------|--------|---------|---------|---------|---------|
+| 001       | 0      | 0       | -0.05   | 0       | -0.05   |
+| 001       | 1      | 0       | 0       | 0       | 0       |
+| 001       | 0      | 0.5     | 0.465   | 0.5     | 0.465   |
+| 001       | 0      | 3       | 2.89    | 3       | 2.89    |
+| 001       | 1      | 24      | 24.05   | 0       | 0       |
+| 001       | 0      | 25      | 25.15   | 1       | 1.15    |
+
+## `ADPPK` Expected Variables
+
+-   `EVID` Event ID
+-   `DV` Dependent Variable
+-   `MDV` Missing Dependent Variable
+-   `BLQ` Below Limit of Quantitation
+
+## `ADPPK` Covariates
+
+-   `<COV>BL` for baseline covariate, (e.g., `WTBL`, `BMIBL`)
+-   `<COV>N` for numerical version of categorical covariate (e.g., `SEXN`, `RACEN`)
+-   `<COV>I` for any covariates with imputed values (e.g., `WTI`, `BMII`)
+-   `<COV>GRy` for grouping covariates (e.g. `AGEGR1`)
+
+## `{admiral}`
+
+[![](./images/admiral.png){width="200"}](https://github.com/pharmaverse/admiral)
+
+-   `AD`a`M i`n `R A`sset `L`ibrary
+-   `{admiral}` is Open Source and Collaborative
+-   `{admiral}` is Modular
+-   `{admiral}` is Part of Pharmaverse
+
+[https://github.com/pharmaverse/admiral](https://github.com/pharmaverse/admiral){target="_blank"}
+
+## `{admiral}` Functions Used
+
+-   `derive_vars_dtm()`
+-   `derive_vars_dtm_to_dt()`
+-   `derive_vars_dtm_to_tm()`
+-   `derive_vars_dy()`
+-   `derive_vars_duration()`
+-   `create_single_dose_dataset()`
+
+## `{admiral}` Functions Used (continued)
+
+-   `derive_vars_merged()`
+-   `derive_vars_joined()`
+-   `derive_vars_transposed()`
+-   `compute_bmi()`
+-   `compute_bsa()`
+-   `compute_egfr()`
+
+## Welcome to the Pharmaverse
+
+[![](./images/Pharmaverse_website.png)](https://github.com/pharmaverse)
+
+[https://pharmaverse.org/](https://pharmaverse.org/){target="_blank"}
+
+::: notes
+Pharmaverse a connected network of companies and individuals working to promote collaborative development of open source R packages for clinical reporting usage across our industry
+:::
+
+## Other Pharmaverse Packages in `ADPPK` Workflow
+
+-   `{pharmaversesdtm}` CDISC pilot SDTM data![](images/pharmaversesdtm.png){width="50"}
+-   `{metacore}` Store metadata![](images/metacore.png){width="50"}
+-   `{metatools}` Work with metadata and perform checks![](images/metatools.png){width="50"}
+-   `{xportr}` Perform checks and export transport files (XPT)![](images/xportr.png){width="50"}
+
+## End to End Example Site
+
+[![](./images/End_to_end_website.png)](https://pharmaverse.github.io/e2e_pk/)
+
+[https://pharmaverse.github.io/e2e_pk/](https://pharmaverse.github.io/e2e_pk/){target="_blank"}
+
+Will focus on ADPPK example
+
+## Coding Highlights
+
+```{r echo=FALSE, message=FALSE}
+#| label: Setup
+
+library(admiraldev)
+source("ad_adppk_spec.R")
+
+print_df <- function(dataset, display_vars = NULL) {
+  display_vars <- assert_vars(display_vars, optional = TRUE)
+  assert_data_frame(dataset, required_vars = display_vars)
+
+  out <- dataset %>% 
+    select(!!!display_vars) 
+  
+  
+  head(out, n = 20)
+}
+
+
+```
+
+::: incremental
+-   Load Specs with `{metacore}`
+-   Derive PC Dates
+-   Expand Dosing Records
+-   Find First Dose
+-   Find Previous Dose
+-   Find Previous Nominal Dose
+-   Derive Covariates Using `{metacore}`
+-   `{metacore}` Checks
+-   `{xportr}` Steps
+:::
+
+## Load Specs with `{metacore}`
+
+```{r echo=TRUE, message=FALSE}
+#| label: Load Specs
+#| warning: false
+# ---- Load Specs for Metacore ----
+metacore <- spec_to_metacore("pk_spec.xlsx") %>%
+  select_dataset("ADPPK")
+```
+
+## Derive PC Dates
+
+```{r echo=TRUE}
+#| label: PC Dates
+#| code-line-numbers: "|3-7"
+pc_dates <- pc %>%
+  # Join ADSL with PC (need TRTSDT for ADY derivation)
+  derive_vars_merged(
+    dataset_add = adsl,
+    new_vars = adsl_vars,
+    by_vars = exprs(STUDYID, USUBJID)
+  ) %>%
+  # Derive analysis date/time
+  # Impute missing time to 00:00:00
+  derive_vars_dtm(
+    new_vars_prefix = "A",
+    dtc = PCDTC,
+    time_imputation = "00:00:00"
+  ) %>%
+  # Derive dates and times from date/times
+  derive_vars_dtm_to_dt(exprs(ADTM)) %>%
+  derive_vars_dtm_to_tm(exprs(ADTM)) %>%
+  # Derive event ID and nominal relative time from first dose (NFRLT)
+  mutate(
+    EVID = 0,
+    DRUG = PCTEST,
+    NFRLT = if_else(PCTPTNUM < 0, 0, PCTPTNUM), .after = USUBJID
+  )
+```
+
+## Expand Dosing Records
+
+```{r echo=TRUE}
+#| label: Expand
+#| code-line-numbers: "|2-17"
+ex_exp <- ex_dates %>%
+  create_single_dose_dataset(
+    dose_freq = EXDOSFRQ,
+    start_date = ASTDT,
+    start_datetime = ASTDTM,
+    end_date = AENDT,
+    end_datetime = AENDTM,
+    nominal_time = NFRLT,
+    lookup_table = dose_freq_lookup,
+    lookup_column = CDISC_VALUE,
+    keep_source_vars = exprs(
+      STUDYID, USUBJID, EVID, EXDOSFRQ, EXDOSFRM,
+      NFRLT, EXDOSE, EXDOSU, EXTRT, ASTDT, ASTDTM, AENDT, AENDTM,
+      VISIT, VISITNUM, VISITDY,
+      TRT01A, TRT01P, DOMAIN, EXSEQ, !!!adsl_vars
+    )
+  ) %>%
+  # Derive AVISIT based on nominal relative time
+  # Derive AVISITN to nominal time in whole days using integer division
+  # Define AVISIT based on nominal day
+  mutate(
+    AVISITN = NFRLT %/% 24 + 1,
+    AVISIT = paste("Day", AVISITN),
+    ADTM = ASTDTM,
+    DRUG = EXTRT
+  ) %>%
+  # Derive dates and times from datetimes
+  derive_vars_dtm_to_dt(exprs(ADTM)) %>%
+  derive_vars_dtm_to_tm(exprs(ADTM)) %>%
+  derive_vars_dtm_to_tm(exprs(ASTDTM)) %>%
+  derive_vars_dtm_to_tm(exprs(AENDTM))
+```
+
+## Find First Dose
+
+```{r echo=TRUE}
+#| label: First Dose
+#| code-line-numbers: "|2-9"
+adppk_first_dose <- pc_dates %>%
+  derive_vars_merged(
+    dataset_add = ex_exp,
+    filter_add = (!is.na(ADTM)),
+    new_vars = exprs(FANLDTM = ADTM, EXDOSE_first = EXDOSE),
+    order = exprs(ADTM, EXSEQ),
+    mode = "first",
+    by_vars = exprs(STUDYID, USUBJID, DRUG)
+  ) %>%
+  filter(!is.na(FANLDTM)) %>%
+  # Derive AVISIT based on nominal relative time
+  # Derive AVISITN to nominal time in whole days using integer division
+  # Define AVISIT based on nominal day
+  mutate(
+    AVISITN = NFRLT %/% 24 + 1,
+    AVISIT = paste("Day", AVISITN),
+  )
+```
+
+## Find Previous Dose
+
+```{r echo=TRUE}
+#| label: Previous Dose
+#| code-line-numbers: "|2-15"
+adppk_prev <- adppk_first_dose %>%
+  derive_vars_joined(
+    dataset_add = ex_exp,
+    by_vars = exprs(USUBJID),
+    order = exprs(ADTM),
+    new_vars = exprs(
+      ADTM_prev = ADTM, EXDOSE_prev = EXDOSE, AVISIT_prev = AVISIT,
+      AENDTM_prev = AENDTM
+    ),
+    join_vars = exprs(ADTM),
+    filter_add = NULL,
+    filter_join = ADTM > ADTM.join,
+    mode = "last",
+    check_type = "none"
+  )
+```
+
+## Find Previous Nominal Dose
+
+```{r echo=TRUE}
+#| label: Previous Nominal Dose
+adppk_nom_prev <- adppk_prev %>%
+  derive_vars_joined(
+    dataset_add = ex_exp,
+    by_vars = exprs(USUBJID),
+    order = exprs(NFRLT),
+    new_vars = exprs(NFRLT_prev = NFRLT),
+    join_vars = exprs(NFRLT),
+    filter_add = NULL,
+    filter_join = NFRLT > NFRLT.join,
+    mode = "last",
+    check_type = "none"
+  )
+```
+
+## Derive Covariates Using Metacore
+
+Use `metatools::create_var_from_codelist()`
+
+```{r echo=TRUE}
+#| label: Covariates
+#| code-line-numbers: "|4-5"
+#---- Derive Covariates ----
+covar <- adsl %>%
+  create_var_from_codelist(metacore, input_var = STUDYID, out_var = STUDYIDN) %>%
+  create_var_from_codelist(metacore, input_var = SEX, out_var = SEXN) %>%
+  create_var_from_codelist(metacore, input_var = RACE, out_var = RACEN) %>%
+  create_var_from_codelist(metacore, input_var = ETHNIC, out_var = AETHNIC) %>%
+  create_var_from_codelist(metacore, input_var = AETHNIC, out_var = AETHNICN) %>%
+  create_var_from_codelist(metacore, input_var = ARMCD, out_var = COHORT) %>%
+  create_var_from_codelist(metacore, input_var = ARMCD, out_var = COHORTC) %>%
+  create_var_from_codelist(metacore, input_var = COUNTRY, out_var = COUNTRYN) %>%
+  create_var_from_codelist(metacore, input_var = COUNTRY, out_var = COUNTRYL) %>%
+  mutate(
+    STUDYIDN = as.numeric(word(USUBJID, 1, sep = fixed("-"))),
+    SITEIDN = as.numeric(word(USUBJID, 2, sep = fixed("-"))),
+    USUBJIDN = as.numeric(word(USUBJID, 3, sep = fixed("-"))),
+    SUBJIDN = as.numeric(SUBJID),
+    ROUTE = unique(ex$EXROUTE),
+    FORM = unique(ex$EXDOSFRM),
+    REGION1 = COUNTRY,
+    REGION1N = COUNTRYN,
+    SUBJTYPC = "Volunteer",
+  ) %>%
+  create_var_from_codelist(metacore, input_var = FORM, out_var = FORMN) %>%
+  create_var_from_codelist(metacore, input_var = ROUTE, out_var = ROUTEN) %>%
+  create_var_from_codelist(metacore, input_var = SUBJTYPC, out_var = SUBJTYP)
+```
+
+## Calculate Additional Covariates from Vital Signs and Labs
+
+```{r echo=TRUE}
+#| label: Baselines
+#| code-line-numbers: "20-35"
+covar_vslb <- covar %>%
+  derive_vars_merged(
+    dataset_add = vs,
+    filter_add = VSTESTCD == "HEIGHT",
+    by_vars = exprs(STUDYID, USUBJID),
+    new_vars = exprs(HTBL = VSSTRESN)
+  ) %>%
+  derive_vars_merged(
+    dataset_add = vs,
+    filter_add = VSTESTCD == "WEIGHT" & VSBLFL == "Y",
+    by_vars = exprs(STUDYID, USUBJID),
+    new_vars = exprs(WTBL = VSSTRESN)
+  ) %>%
+  derive_vars_transposed(
+    dataset_merge = labsbl,
+    by_vars = exprs(STUDYID, USUBJID),
+    key_var = LBTESTCDB,
+    value_var = LBSTRESN
+  ) %>%
+  mutate(
+    BMIBL = compute_bmi(height = HTBL, weight = WTBL),
+    BSABL = compute_bsa(
+      height = HTBL,
+      weight = HTBL,
+      method = "Mosteller"
+    ),
+    CRCLBL = compute_egfr(
+      creat = CREATBL, creatu = "SI", age = AGE, weight = WTBL, sex = SEX,
+      method = "CRCL"
+    ),
+    EGFRBL = compute_egfr(
+      creat = CREATBL, creatu = "SI", age = AGE, weight = WTBL, sex = SEX,
+      method = "CKD-EPI"
+    )
+  ) %>%
+  rename(TBILBL = BILIBL)
+```
+
+## `{metacore}` Checks
+
+```{r echo=TRUE}
+#| label: Metacore
+#| warning: false
+adppk <- adppk_prefinal %>%
+  drop_unspec_vars(metacore) %>% # Drop unspecified variables from specs
+  check_variables(metacore) %>% # Check all variables specified are present and no more
+  check_ct_data(metacore) %>% # Checks all variables with CT only contain values within the CT
+  order_cols(metacore) %>% # Orders the columns according to the spec
+  sort_by_key(metacore) # Sorts the rows by the sort keys
+```
+
+## `{xportr}` Steps
+
+```{r echo=TRUE}
+#| label: xportr
+adppk_xpt <- adppk %>%
+  xportr_type(metacore) %>% # Coerce variable type to match spec
+  xportr_length(metacore) %>% # Assigns SAS length from a variable level metadata
+  xportr_label(metacore) %>% # Assigns variable label from metacore specifications
+  xportr_format(metacore) %>% # Assigns variable format from metacore specifications
+  xportr_df_label(metacore) %>% # Assigns dataset label from metacore specifications
+  xportr_write(file.path(dir, "adppk.xpt")) # Write xpt v5 transport file
+```
+
+## `ADPPK_XPT`
+
+```{r eval=TRUE, echo=FALSE}
+adppk_xpt %>%
+  print_df(display_vars = exprs(
+    USUBJID, EVID, NFRLT, NPRLT, AFRLT, APRLT, DV
+  ))
+```
+
+## Summary
+
+-   CDISC ADaM Implementation guides for `ADNCA` and `ADPPK` available
+-   `{admiral}` template programs exist for these
+-   Pharmaverse tools can streamline the workflow
+-   Examples Website [https://pharmaverse.github.io/e2e_pk/](https://pharmaverse.github.io/e2e_pk/){target="_blank"}
+
+## Thank You!
+
+-   `{admiral}` Core Team
+-   Slack Pharmaverse PK Working Group
+-   Luke Reinbolt
+-   Ben Straub
+
+## Questions
+
+![](images/Navitas.PNG)
