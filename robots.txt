@@ -1,1 +1,1 @@
-Sitemap: https://quartopub.com/sites/jeffdickinson/end-to-end-examples-for-pk/sitemap.xml
+Sitemap: https://jeffreyad.github.io/adppk/sitemap.xml
