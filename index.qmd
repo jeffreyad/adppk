@@ -6,7 +6,7 @@ This site includes end to end examples for PK using `{admiral}` and other [Pharm
 
 ### `{admiral}` -- Use to build CDISC analysis data
 
-[![](images/admiral.png){width="15%"}](https://pharmaverse.github.io/admiral/cran-release/)
+[![](images/admiral.png){width="15%"}](https://pharmaverse.github.io/admiral/index.html)
 
 ### `{metacore}` -- Create and manage metadata for the analysis data
 
