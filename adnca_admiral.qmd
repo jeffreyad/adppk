@@ -193,7 +193,6 @@ library(pharmaversesdtm)
 library(dplyr)
 library(lubridate)
 library(stringr)
-
 ```
 
 ::: notes
@@ -203,7 +202,6 @@ Here are the required packages
 ## Read in Data
 
 ```{r echo=TRUE, message=FALSE}
-
 data("admiral_adsl")
 data("ex")
 data("pc")
@@ -213,7 +211,6 @@ adsl <- admiral_adsl
 ex <- convert_blanks_to_na(ex)
 pc <- convert_blanks_to_na(pc)
 vs <- convert_blanks_to_na(vs)
-
 ```
 
 ::: notes
@@ -221,7 +218,7 @@ We read in the test dataset from the pharmaversesdtm library Note we convert bla
 :::
 
 ```{r echo=FALSE}
-options(max.print=25)
+options(max.print = 25)
 
 ex <- filter(ex, USUBJID %in% c("01-701-1028"))
 pc <- filter(pc, USUBJID %in% c("01-701-1028"))
@@ -236,14 +233,12 @@ print_df <- function(dataset, display_vars = NULL) {
   display_vars <- assert_vars(display_vars, optional = TRUE)
   assert_data_frame(dataset, required_vars = display_vars)
 
-  out <- dataset %>% 
-    select(!!!display_vars) 
-  
-  
+  out <- dataset %>%
+    select(!!!display_vars)
+
+
   head(out, n = 20)
 }
-
-
 ```
 
 ## `PC` Rawdata
@@ -320,10 +315,9 @@ Here is the code for joining ADSL with PC
 ## `PC` Merge Code Output
 
 ```{r eval=TRUE, echo=FALSE}
-
-print_df(adpc, 
-         display_vars = exprs(USUBJID, PCTEST, ADTM, VISIT, PCTPT, NFRLT))
-
+print_df(adpc,
+  display_vars = exprs(USUBJID, PCTEST, ADTM, VISIT, PCTPT, NFRLT)
+)
 ```
 
 Note numeric datetimes and Nominal Relative Time from Analyte First Dose (`NFRLT`)
@@ -369,7 +363,7 @@ First we merge with ADSL
 
 ```{r eval=TRUE, echo=TRUE}
 #| code-line-numbers: "|4-8|14-18|27"
-#| 
+#|
 # ---- Get dosing information ----
 
 ex <- ex %>%
@@ -482,7 +476,6 @@ Here is our expansion code Note new parameter of create_single_dose_dataset()
 ## Expansion Code Output
 
 ```{r eval=TRUE, echo=FALSE}
-
 print_df(
   ex_exp,
   display_vars = exprs(USUBJID, DRUG, EXDOSFRQ, ASTDT, AVISIT, NFRLT)
@@ -857,7 +850,6 @@ Here is the output from derviing nominal relative times Note `NFRLT` Nominal Rel
 ## Derive Analysis Variables
 
 ```{r eval=TRUE, echo=TRUE}
-
 adpc <- adpc %>%
   mutate(
     ATPTN = case_when(
@@ -987,7 +979,7 @@ Here is the code for the duplicated records ATPT is changed to "Pre-dose" Note `
 ```{r eval=TRUE, echo=FALSE}
 print_df(
   dtype,
-  display_vars = exprs(USUBJID, DTYPE, BASETYPE, ATPT, NFRLT, NRRLT, AFRLT, ARRLT )
+  display_vars = exprs(USUBJID, DTYPE, BASETYPE, ATPT, NFRLT, NRRLT, AFRLT, ARRLT)
 )
 ```
 
@@ -1030,7 +1022,6 @@ Here is output from combined records Note DTYPE = "COPY" records
 ## Calculate Baseline and Change from Baseline
 
 ```{r eval=TRUE, echo=TRUE}
-
 # ---- Calculate BASE and Change from Baseline ----
 
 adpc <- adpc %>%
@@ -1119,7 +1110,6 @@ Now we add additional baselines from vital signs
 ## Additional Baseline Variables Code
 
 ```{r eval=TRUE, echo=TRUE}
-
 # Derive additional baselines from VS
 adpc <- adpc %>%
   derive_vars_merged(

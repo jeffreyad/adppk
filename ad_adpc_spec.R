@@ -340,7 +340,7 @@ adpc_aval <- adpc_nrrlt %>%
     ),
     # Derive BASETYPE
     BASETYPE = paste(ATPTREF, "Baseline"),
-    
+
     # Derive Actual Dose
     DOSEA = case_when(
       EVID == 1 ~ EXDOSE,
