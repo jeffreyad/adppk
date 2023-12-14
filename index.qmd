@@ -6,20 +6,20 @@ This site includes end to end examples for PK using `{admiral}` and other [Pharm
 
 ### `{admiral}` -- Use to build CDISC analysis data
 
-[![](images/admiral.png){width="15%"}](https://pharmaverse.github.io/admiral/cran-release/){target="_blank"}
+[![](images/admiral.png){width="15%"}](https://pharmaverse.github.io/admiral/cran-release/)
 
 ### `{metacore}` -- Create and manage metadata for the analysis data
 
-[![](images/metacore.png){width="15%"}](https://atorus-research.github.io/metacore/){target="_blank"}
+[![](images/metacore.png){width="15%"}](https://atorus-research.github.io/metacore/)
 
 ### `{metatools}` -- Work with metadata to derive variables and perform checks
 
-[![](images/metatools.png){width="15%"}](https://pharmaverse.github.io/metatools/){target="_blank"}
+[![](images/metatools.png){width="15%"}](https://pharmaverse.github.io/metatools/)
 
 ### `{xportr}` -- Perform checks on data and export to transport file
 
-[![](images/xportr.png){width="15%"}](https://atorus-research.github.io/xportr/){target="_blank"}
+[![](images/xportr.png){width="15%"}](https://atorus-research.github.io/xportr/)
 
 ### `{pharmaversesdtm}` -- Sample Pharmaverse CDISC SDTM data
 
-[![](images/pharmaversesdtm.png){width="15%"}](https://pharmaverse.github.io/pharmaversesdtm/cran-release/){target="_blank"}
+[![](images/pharmaversesdtm.png){width="15%"}](https://pharmaverse.github.io/pharmaversesdtm/cran-release/)
