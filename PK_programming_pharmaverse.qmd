@@ -233,14 +233,12 @@ print_df <- function(dataset, display_vars = NULL) {
   display_vars <- assert_vars(display_vars, optional = TRUE)
   assert_data_frame(dataset, required_vars = display_vars)
 
-  out <- dataset %>% 
-    select(!!!display_vars) 
-  
-  
+  out <- dataset %>%
+    select(!!!display_vars)
+
+
   head(out, n = 20)
 }
-
-
 ```
 
 ::: incremental
