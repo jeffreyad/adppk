@@ -154,7 +154,7 @@ Will focus on ADPPK example
 #| label: Setup
 
 library(admiraldev)
-source("ad_adppk_spec.R")
+source("inst/templates/ad_adppk_spec.R")
 
 print_df <- function(dataset, display_vars = NULL) {
   display_vars <- assert_vars(display_vars, optional = TRUE)
