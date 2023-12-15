@@ -63,6 +63,20 @@
     "text": "This site includes end to end examples for PK using {admiral} and other Pharmaverse tools\n\n{admiral} – Use to build CDISC analysis data\n\n\n\n\n\n\n\n{metacore} – Create and manage metadata for the analysis data\n\n\n\n\n\n\n\n{metatools} – Work with metadata to derive variables and perform checks\n\n\n\n\n\n\n\n{xportr} – Perform checks on data and export to transport file\n\n\n\n\n\n\n\n{pharmaversesdtm} – Sample Pharmaverse CDISC SDTM data"
   },
   {
+    "objectID": "phuse_poster_paper.html",
+    "href": "phuse_poster_paper.html",
+    "title": "phuse_poster_paper",
+    "section": "",
+    "text": "Population Pharmacokinetic modeling is an important tool for drug development. The CDISC ADaM Population PK Implementation Guide is forthcoming. Population PK models generally make use of nonlinear mixed effects models that require numeric variables. The data used in the models will include both dosing and concentration records, relative time variables, and numeric covariate variables. {admiral} is an open-source R package for creating CDISC ADaM data. It can be used effectively to create Population PK analysis data (ADPPK). Additional tools from other Pharmaverse packages such as {metacore}, {metatools} and {xportr} can be used to simplify the workflow. I will discuss some of the challenges of Population Pharmacokinetic analysis data programming and show some of the solutions developed in {admiral} and the Pharmaverse."
+  },
+  {
+    "objectID": "phuse_poster_paper.html#abstract",
+    "href": "phuse_poster_paper.html#abstract",
+    "title": "phuse_poster_paper",
+    "section": "",
+    "text": "Population Pharmacokinetic modeling is an important tool for drug development. The CDISC ADaM Population PK Implementation Guide is forthcoming. Population PK models generally make use of nonlinear mixed effects models that require numeric variables. The data used in the models will include both dosing and concentration records, relative time variables, and numeric covariate variables. {admiral} is an open-source R package for creating CDISC ADaM data. It can be used effectively to create Population PK analysis data (ADPPK). Additional tools from other Pharmaverse packages such as {metacore}, {metatools} and {xportr} can be used to simplify the workflow. I will discuss some of the challenges of Population Pharmacokinetic analysis data programming and show some of the solutions developed in {admiral} and the Pharmaverse."
+  },
+  {
     "objectID": "adppk.html",
     "href": "adppk.html",
     "title": "ADPPK Template Walkthrough",
@@ -124,6 +138,223 @@
     "title": "ADPPK Template Walkthrough",
     "section": "Save Final Output",
     "text": "Save Final Output\nFinally we save the final output. We will also create a CSV file for the modeler.\n\n# ---- Save output ----\nsaveRDS(adppk, file = file.path(dir, \"adppk.rds\"), compress = \"bzip2\")\n\n# Write CSV\nwrite_csv(adppk_xpt, \"./output/adppk.csv\")"
+  },
+  {
+    "objectID": "phuse_poster.html#abstract",
+    "href": "phuse_poster.html#abstract",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Abstract",
+    "text": "Abstract\nPopulation Pharmacokinetic modeling is an important tool for drug development. The CDISC ADaM Population PK Implementation Guide is forthcoming. Population PK models generally make use of nonlinear mixed effects models that require numeric variables. The data used in the models will include both dosing and concentration records, relative time variables, and numeric covariate variables. {admiral} is an open-source R package for creating CDISC ADaM data. It can be used effectively to create Population PK analysis data (ADPPK). Additional tools from other Pharmaverse packages such as {metacore}, {metatools} and {xportr} can be used to simplify the workflow. I will discuss some of the challenges of Population Pharmacokinetic analysis data programming and show some of the solutions developed in {admiral} and the Pharmaverse."
+  },
+  {
+    "objectID": "phuse_poster.html#agenda",
+    "href": "phuse_poster.html#agenda",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Agenda",
+    "text": "Agenda\n\nWhat is PK data\nTypes of PK analysis data\nBrief overview of {admiral} and the Pharmaverse\nProgramming Workflow\nSome Additional Pharmaverse tools\nPharmaverse Website Example"
+  },
+  {
+    "objectID": "phuse_poster.html#pharmacokinetics-overview",
+    "href": "phuse_poster.html#pharmacokinetics-overview",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Pharmacokinetics Overview",
+    "text": "Pharmacokinetics Overview\n\n\nPharmacokinetics is the interaction of a drug with the body\nSamples collected at regular time intervals after dosing\nMetrics calculated from concentrations over time"
+  },
+  {
+    "objectID": "phuse_poster.html#two-main-types-of-modelling",
+    "href": "phuse_poster.html#two-main-types-of-modelling",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Two Main Types of Modelling",
+    "text": "Two Main Types of Modelling\n\nNon-Compartmental Analysis (NCA)\nPopulation PK (PopPK)"
+  },
+  {
+    "objectID": "phuse_poster.html#population-pk-poppk-adppk",
+    "href": "phuse_poster.html#population-pk-poppk-adppk",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Population PK (PopPK) – ADPPK",
+    "text": "Population PK (PopPK) – ADPPK\n\nPopulation Based\nLess Intensive Sampling\nCan Detect Variations based on Covariates"
+  },
+  {
+    "objectID": "phuse_poster.html#cdisc-standards-for-population-pk-analysis",
+    "href": "phuse_poster.html#cdisc-standards-for-population-pk-analysis",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "CDISC Standards for Population PK Analysis",
+    "text": "CDISC Standards for Population PK Analysis\n\nPublished October 6, 2023!\nhttps://www.cdisc.org/standards/foundational/adam/basic-data-structure-adam-poppk-implementation-guide-v1-0"
+  },
+  {
+    "objectID": "phuse_poster.html#cdisc-adam-pk-standards",
+    "href": "phuse_poster.html#cdisc-adam-pk-standards",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "CDISC ADaM PK Standards",
+    "text": "CDISC ADaM PK Standards\n\nADNCA (NCA) – released November 2021\nADPPK (PopPK) – released October 2023\nADPP (PK Parameters) – coming in 2024"
+  },
+  {
+    "objectID": "phuse_poster.html#characteristics-of-pk-analysis-data",
+    "href": "phuse_poster.html#characteristics-of-pk-analysis-data",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Characteristics of PK Analysis Data",
+    "text": "Characteristics of PK Analysis Data\n\nIncludes both exposure (EX) and concentration data (PC)\nIncludes nominal and actual relative time variables\nDuplicated Records for Analysis (ADNCA)\nNumeric Covariates for Modelling (ADPPK)\nMay need to expand dosing records"
+  },
+  {
+    "objectID": "phuse_poster.html#time-variables-adppk",
+    "href": "phuse_poster.html#time-variables-adppk",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Time Variables (ADPPK)",
+    "text": "Time Variables (ADPPK)\n\n\n\nVariable\nVariable Label\n\n\n\n\nNFRLT\nNominal Rel Time from First Dose\n\n\nAFRLT\nActual Rel Time from First Dose\n\n\nNPRLT\nNominal Rel Time from Previous Dose\n\n\nAPRLT\nActual Rel Time from Previous Dose"
+  },
+  {
+    "objectID": "phuse_poster.html#time-variables-example",
+    "href": "phuse_poster.html#time-variables-example",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Time Variables Example",
+    "text": "Time Variables Example\n\n\n\nUSUBJID\nEVID\nNFRLT\nAFRLT\nNPRLT\nARRLT\n\n\n\n\n001\n0\n0\n-0.05\n0\n-0.05\n\n\n001\n1\n0\n0\n0\n0\n\n\n001\n0\n0.5\n0.465\n0.5\n0.465\n\n\n001\n0\n3\n2.89\n3\n2.89\n\n\n001\n1\n24\n24.05\n0\n0\n\n\n001\n0\n25\n25.15\n1\n1.15"
+  },
+  {
+    "objectID": "phuse_poster.html#adppk-expected-variables",
+    "href": "phuse_poster.html#adppk-expected-variables",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "ADPPK Expected Variables",
+    "text": "ADPPK Expected Variables\n\nEVID Event ID\nDV Dependent Variable\nMDV Missing Dependent Variable\nBLQ Below Limit of Quantitation"
+  },
+  {
+    "objectID": "phuse_poster.html#adppk-covariates",
+    "href": "phuse_poster.html#adppk-covariates",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "ADPPK Covariates",
+    "text": "ADPPK Covariates\n\n&lt;COV&gt;BL for baseline covariate, (e.g., WTBL, BMIBL)\n&lt;COV&gt;N for numerical version of categorical covariate (e.g., SEXN, RACEN)\n&lt;COV&gt;I for any covariates with imputed values (e.g., WTI, BMII)\n&lt;COV&gt;GRy for grouping covariates (e.g. AGEGR1)"
+  },
+  {
+    "objectID": "phuse_poster.html#admiral",
+    "href": "phuse_poster.html#admiral",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "{admiral}",
+    "text": "{admiral}\n\n\nADaM in R Asset Library\n{admiral} is Open Source and Collaborative\n{admiral} is Modular\n{admiral} is Part of Pharmaverse\n\nhttps://github.com/pharmaverse/admiral"
+  },
+  {
+    "objectID": "phuse_poster.html#admiral-functions-used",
+    "href": "phuse_poster.html#admiral-functions-used",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "{admiral} Functions Used",
+    "text": "{admiral} Functions Used\n\nderive_vars_dtm()\nderive_vars_dtm_to_dt()\nderive_vars_dtm_to_tm()\nderive_vars_dy()\nderive_vars_duration()\ncreate_single_dose_dataset()"
+  },
+  {
+    "objectID": "phuse_poster.html#admiral-functions-used-continued",
+    "href": "phuse_poster.html#admiral-functions-used-continued",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "{admiral} Functions Used (continued)",
+    "text": "{admiral} Functions Used (continued)\n\nderive_vars_merged()\nderive_vars_joined()\nderive_vars_transposed()\ncompute_bmi()\ncompute_bsa()\ncompute_egfr()"
+  },
+  {
+    "objectID": "phuse_poster.html#other-pharmaverse-packages-in-adppk-workflow",
+    "href": "phuse_poster.html#other-pharmaverse-packages-in-adppk-workflow",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Other Pharmaverse Packages in ADPPK Workflow",
+    "text": "Other Pharmaverse Packages in ADPPK Workflow\n\n{pharmaversesdtm} CDISC pilot SDTM data\n{metacore} Store metadata\n{metatools} Work with metadata and perform checks\n{xportr} Perform checks and export transport files (XPT)"
+  },
+  {
+    "objectID": "phuse_poster.html#end-to-end-example-site",
+    "href": "phuse_poster.html#end-to-end-example-site",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "End to End Example Site",
+    "text": "End to End Example Site\n\nhttps://pharmaverse.github.io/examples/\nWill focus on ADPPK example"
+  },
+  {
+    "objectID": "phuse_poster.html#coding-highlights",
+    "href": "phuse_poster.html#coding-highlights",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Coding Highlights",
+    "text": "Coding Highlights\n\n\nLoad Specs with {metacore}\nDerive PC Dates\nExpand Dosing Records\nFind First Dose\nFind Previous Dose\nFind Previous Nominal Dose\nDerive Covariates Using {metacore}\n{metacore} Checks\n{xportr} Steps"
+  },
+  {
+    "objectID": "phuse_poster.html#load-specs-with-metacore",
+    "href": "phuse_poster.html#load-specs-with-metacore",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Load Specs with {metacore}",
+    "text": "Load Specs with {metacore}\n\n# ---- Load Specs for Metacore ----\nmetacore &lt;- spec_to_metacore(\"pk_spec.xlsx\") %&gt;%\n  select_dataset(\"ADPPK\")"
+  },
+  {
+    "objectID": "phuse_poster.html#derive-pc-dates",
+    "href": "phuse_poster.html#derive-pc-dates",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Derive PC Dates",
+    "text": "Derive PC Dates\n\npc_dates &lt;- pc %&gt;%\n  # Join ADSL with PC (need TRTSDT for ADY derivation)\n  derive_vars_merged(\n    dataset_add = adsl,\n    new_vars = adsl_vars,\n    by_vars = exprs(STUDYID, USUBJID)\n  ) %&gt;%\n  # Derive analysis date/time\n  # Impute missing time to 00:00:00\n  derive_vars_dtm(\n    new_vars_prefix = \"A\",\n    dtc = PCDTC,\n    time_imputation = \"00:00:00\"\n  ) %&gt;%\n  # Derive dates and times from date/times\n  derive_vars_dtm_to_dt(exprs(ADTM)) %&gt;%\n  derive_vars_dtm_to_tm(exprs(ADTM)) %&gt;%\n  # Derive event ID and nominal relative time from first dose (NFRLT)\n  mutate(\n    EVID = 0,\n    DRUG = PCTEST,\n    NFRLT = if_else(PCTPTNUM &lt; 0, 0, PCTPTNUM), .after = USUBJID\n  )"
+  },
+  {
+    "objectID": "phuse_poster.html#expand-dosing-records",
+    "href": "phuse_poster.html#expand-dosing-records",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Expand Dosing Records",
+    "text": "Expand Dosing Records\n\nex_exp &lt;- ex_dates %&gt;%\n  create_single_dose_dataset(\n    dose_freq = EXDOSFRQ,\n    start_date = ASTDT,\n    start_datetime = ASTDTM,\n    end_date = AENDT,\n    end_datetime = AENDTM,\n    nominal_time = NFRLT,\n    lookup_table = dose_freq_lookup,\n    lookup_column = CDISC_VALUE,\n    keep_source_vars = exprs(\n      STUDYID, USUBJID, EVID, EXDOSFRQ, EXDOSFRM,\n      NFRLT, EXDOSE, EXDOSU, EXTRT, ASTDT, ASTDTM, AENDT, AENDTM,\n      VISIT, VISITNUM, VISITDY,\n      TRT01A, TRT01P, DOMAIN, EXSEQ, !!!adsl_vars\n    )\n  ) %&gt;%\n  # Derive AVISIT based on nominal relative time\n  # Derive AVISITN to nominal time in whole days using integer division\n  # Define AVISIT based on nominal day\n  mutate(\n    AVISITN = NFRLT %/% 24 + 1,\n    AVISIT = paste(\"Day\", AVISITN),\n    ADTM = ASTDTM,\n    DRUG = EXTRT\n  ) %&gt;%\n  # Derive dates and times from datetimes\n  derive_vars_dtm_to_dt(exprs(ADTM)) %&gt;%\n  derive_vars_dtm_to_tm(exprs(ADTM)) %&gt;%\n  derive_vars_dtm_to_tm(exprs(ASTDTM)) %&gt;%\n  derive_vars_dtm_to_tm(exprs(AENDTM))"
+  },
+  {
+    "objectID": "phuse_poster.html#find-first-dose",
+    "href": "phuse_poster.html#find-first-dose",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Find First Dose",
+    "text": "Find First Dose\n\nadppk_first_dose &lt;- pc_dates %&gt;%\n  derive_vars_merged(\n    dataset_add = ex_exp,\n    filter_add = (!is.na(ADTM)),\n    new_vars = exprs(FANLDTM = ADTM, EXDOSE_first = EXDOSE),\n    order = exprs(ADTM, EXSEQ),\n    mode = \"first\",\n    by_vars = exprs(STUDYID, USUBJID, DRUG)\n  ) %&gt;%\n  filter(!is.na(FANLDTM)) %&gt;%\n  # Derive AVISIT based on nominal relative time\n  # Derive AVISITN to nominal time in whole days using integer division\n  # Define AVISIT based on nominal day\n  mutate(\n    AVISITN = NFRLT %/% 24 + 1,\n    AVISIT = paste(\"Day\", AVISITN),\n  )"
+  },
+  {
+    "objectID": "phuse_poster.html#find-previous-dose",
+    "href": "phuse_poster.html#find-previous-dose",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Find Previous Dose",
+    "text": "Find Previous Dose\n\nadppk_prev &lt;- adppk_first_dose %&gt;%\n  derive_vars_joined(\n    dataset_add = ex_exp,\n    by_vars = exprs(USUBJID),\n    order = exprs(ADTM),\n    new_vars = exprs(\n      ADTM_prev = ADTM, EXDOSE_prev = EXDOSE, AVISIT_prev = AVISIT,\n      AENDTM_prev = AENDTM\n    ),\n    join_vars = exprs(ADTM),\n    join_type = \"all\",\n    filter_add = NULL,\n    filter_join = ADTM &gt; ADTM.join,\n    mode = \"last\",\n    check_type = \"none\"\n  )"
+  },
+  {
+    "objectID": "phuse_poster.html#find-previous-nominal-dose",
+    "href": "phuse_poster.html#find-previous-nominal-dose",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Find Previous Nominal Dose",
+    "text": "Find Previous Nominal Dose\n\nadppk_nom_prev &lt;- adppk_prev %&gt;%\n  derive_vars_joined(\n    dataset_add = ex_exp,\n    by_vars = exprs(USUBJID),\n    order = exprs(NFRLT),\n    new_vars = exprs(NFRLT_prev = NFRLT),\n    join_vars = exprs(NFRLT),\n    join_type = \"all\",\n    filter_add = NULL,\n    filter_join = NFRLT &gt; NFRLT.join,\n    mode = \"last\",\n    check_type = \"none\"\n  )"
+  },
+  {
+    "objectID": "phuse_poster.html#derive-covariates-using-metacore",
+    "href": "phuse_poster.html#derive-covariates-using-metacore",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Derive Covariates Using Metacore",
+    "text": "Derive Covariates Using Metacore\nUse metatools::create_var_from_codelist()\n\n#---- Derive Covariates ----\ncovar &lt;- adsl %&gt;%\n  create_var_from_codelist(metacore, input_var = STUDYID, out_var = STUDYIDN) %&gt;%\n  create_var_from_codelist(metacore, input_var = SEX, out_var = SEXN) %&gt;%\n  create_var_from_codelist(metacore, input_var = RACE, out_var = RACEN) %&gt;%\n  create_var_from_codelist(metacore, input_var = ETHNIC, out_var = AETHNIC) %&gt;%\n  create_var_from_codelist(metacore, input_var = AETHNIC, out_var = AETHNICN) %&gt;%\n  create_var_from_codelist(metacore, input_var = ARMCD, out_var = COHORT) %&gt;%\n  create_var_from_codelist(metacore, input_var = ARMCD, out_var = COHORTC) %&gt;%\n  create_var_from_codelist(metacore, input_var = COUNTRY, out_var = COUNTRYN) %&gt;%\n  create_var_from_codelist(metacore, input_var = COUNTRY, out_var = COUNTRYL) %&gt;%\n  mutate(\n    STUDYIDN = as.numeric(word(USUBJID, 1, sep = fixed(\"-\"))),\n    SITEIDN = as.numeric(word(USUBJID, 2, sep = fixed(\"-\"))),\n    USUBJIDN = as.numeric(word(USUBJID, 3, sep = fixed(\"-\"))),\n    SUBJIDN = as.numeric(SUBJID),\n    ROUTE = unique(ex$EXROUTE),\n    FORM = unique(ex$EXDOSFRM),\n    REGION1 = COUNTRY,\n    REGION1N = COUNTRYN,\n    SUBJTYPC = \"Volunteer\",\n  ) %&gt;%\n  create_var_from_codelist(metacore, input_var = FORM, out_var = FORMN) %&gt;%\n  create_var_from_codelist(metacore, input_var = ROUTE, out_var = ROUTEN) %&gt;%\n  create_var_from_codelist(metacore, input_var = SUBJTYPC, out_var = SUBJTYP)"
+  },
+  {
+    "objectID": "phuse_poster.html#calculate-additional-covariates-from-vital-signs-and-labs",
+    "href": "phuse_poster.html#calculate-additional-covariates-from-vital-signs-and-labs",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Calculate Additional Covariates from Vital Signs and Labs",
+    "text": "Calculate Additional Covariates from Vital Signs and Labs\n\ncovar_vslb &lt;- covar %&gt;%\n  derive_vars_merged(\n    dataset_add = vs,\n    filter_add = VSTESTCD == \"HEIGHT\",\n    by_vars = exprs(STUDYID, USUBJID),\n    new_vars = exprs(HTBL = VSSTRESN)\n  ) %&gt;%\n  derive_vars_merged(\n    dataset_add = vs,\n    filter_add = VSTESTCD == \"WEIGHT\" & VSBLFL == \"Y\",\n    by_vars = exprs(STUDYID, USUBJID),\n    new_vars = exprs(WTBL = VSSTRESN)\n  ) %&gt;%\n  derive_vars_transposed(\n    dataset_merge = labsbl,\n    by_vars = exprs(STUDYID, USUBJID),\n    key_var = LBTESTCDB,\n    value_var = LBSTRESN\n  ) %&gt;%\n  mutate(\n    BMIBL = compute_bmi(height = HTBL, weight = WTBL),\n    BSABL = compute_bsa(\n      height = HTBL,\n      weight = HTBL,\n      method = \"Mosteller\"\n    ),\n    CRCLBL = compute_egfr(\n      creat = CREATBL, creatu = \"SI\", age = AGE, weight = WTBL, sex = SEX,\n      method = \"CRCL\"\n    ),\n    EGFRBL = compute_egfr(\n      creat = CREATBL, creatu = \"SI\", age = AGE, weight = WTBL, sex = SEX,\n      method = \"CKD-EPI\"\n    )\n  ) %&gt;%\n  rename(TBILBL = BILIBL)"
+  },
+  {
+    "objectID": "phuse_poster.html#metacore-checks",
+    "href": "phuse_poster.html#metacore-checks",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "{metacore} Checks",
+    "text": "{metacore} Checks\n\nadppk &lt;- adppk_prefinal %&gt;%\n  drop_unspec_vars(metacore) %&gt;% # Drop unspecified variables from specs\n  check_variables(metacore) %&gt;% # Check all variables specified are present and no more\n  check_ct_data(metacore) %&gt;% # Checks all variables with CT only contain values within the CT\n  order_cols(metacore) %&gt;% # Orders the columns according to the spec\n  sort_by_key(metacore) # Sorts the rows by the sort keys"
+  },
+  {
+    "objectID": "phuse_poster.html#xportr-steps",
+    "href": "phuse_poster.html#xportr-steps",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "{xportr} Steps",
+    "text": "{xportr} Steps\n\nadppk_xpt &lt;- adppk %&gt;%\n  xportr_type(metacore) %&gt;% # Coerce variable type to match spec\n  xportr_length(metacore) %&gt;% # Assigns SAS length from a variable level metadata\n  xportr_label(metacore) %&gt;% # Assigns variable label from metacore specifications\n  xportr_format(metacore) %&gt;% # Assigns variable format from metacore specifications\n  xportr_df_label(metacore) %&gt;% # Assigns dataset label from metacore specifications\n  xportr_write(file.path(dir, \"adppk.xpt\")) # Write xpt v5 transport file"
+  },
+  {
+    "objectID": "phuse_poster.html#adppk_xpt",
+    "href": "phuse_poster.html#adppk_xpt",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "ADPPK_XPT",
+    "text": "ADPPK_XPT\n\n\n       USUBJID EVID NFRLT NPRLT       AFRLT       APRLT         DV\n1  01-701-1028    0  0.00  0.00 -0.50000000 -0.50000000 0.00000000\n2  01-701-1028    1  0.00  0.00  0.00000000  0.00000000         NA\n3  01-701-1028    0  0.08  0.08  0.08333333  0.08333333 0.10156622\n4  01-701-1028    0  0.50  0.50  0.50000000  0.50000000 0.54690177\n5  01-701-1028    0  1.00  1.00  1.00000000  1.00000000 0.92546539\n6  01-701-1028    0  1.50  1.50  1.50000000  1.50000000 1.18750588\n7  01-701-1028    0  2.00  2.00  2.00000000  2.00000000 1.36888945\n8  01-701-1028    0  4.00  4.00  4.00000000  4.00000000 1.68314758\n9  01-701-1028    0  6.00  6.00  6.00000000  6.00000000 1.75529232\n10 01-701-1028    0  8.00  8.00  8.00000000  8.00000000 1.77185470\n11 01-701-1028    0 12.00 12.00 12.00000000 12.00000000 0.49503585\n12 01-701-1028    0 16.00 16.00 16.00000000 16.00000000 0.13792316\n13 01-701-1028    0 24.00 24.00 24.00000000 24.00000000 0.01070627\n14 01-701-1028    1 24.00  0.00 24.00000000  0.00000000         NA\n15 01-701-1028    0 36.00 12.00 36.00000000 12.00000000         NA\n16 01-701-1028    0 48.00 24.00 48.00000000 24.00000000         NA\n17 01-701-1028    1 48.00  0.00 48.00000000  0.00000000         NA\n18 01-701-1033    0  0.00  0.00 -0.50000000 -0.50000000 0.00000000\n19 01-701-1033    1  0.00  0.00  0.00000000  0.00000000         NA\n20 01-701-1033    0  0.08  0.08  0.08333333  0.08333333 0.10052550"
+  },
+  {
+    "objectID": "phuse_poster.html#summary",
+    "href": "phuse_poster.html#summary",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Summary",
+    "text": "Summary\n\nCDISC ADaM Implementation guides for ADNCA and ADPPK available\n{admiral} template programs exist for these\nPharmaverse tools can streamline the workflow\nExamples Website https://pharmaverse.github.io/examples/"
+  },
+  {
+    "objectID": "phuse_poster.html#thank-you",
+    "href": "phuse_poster.html#thank-you",
+    "title": "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse",
+    "section": "Thank You!",
+    "text": "Thank You!\n\n{admiral} Core Team\nSlack Pharmaverse PK Working Group\nLuke Reinbolt\nBen Straub"
   },
   {
     "objectID": "PK_programming_pharmaverse.html#agenda",
