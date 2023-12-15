@@ -25,6 +25,7 @@ website:
       - adppk.qmd
       - PK_programming_pharmaverse.qmd
       - phuse_poster.qmd
+      - phuse_poster_pptx.qmd
 
   favicon: images/pharmaverse-favicon.png
   

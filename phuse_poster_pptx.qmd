@@ -1,15 +1,9 @@
 ---
-title: "Population Pharmacokinetic Analysis Data (ADPPK) Programming in {admiral} and the Pharmaverse"
-subtitle: "PHUSE US Connect 2024"
-author: "Jeff Dickinson, Navitas Data Sciences"
-format: 
-  revealjs: 
-    #incremental: true 
-    theme: simple
-    embed-resources: true
-editor: visual
-logo: ./images/Navitas.PNG
+title: "PHUSE poster"
+author: "Jeff Dickinson"
+format: pptx
 ---
+
 
 ## Abstract
 
@@ -154,7 +148,7 @@ Will focus on ADPPK example
 #| label: Setup
 
 library(admiraldev)
-source("ad_adppk_spec.R")
+source("inst/templates/ad_adppk_spec.R")
 
 print_df <- function(dataset, display_vars = NULL) {
   display_vars <- assert_vars(display_vars, optional = TRUE)
@@ -449,3 +443,4 @@ adppk_xpt %>%
 -   Slack Pharmaverse PK Working Group
 -   Luke Reinbolt
 -   Ben Straub
+
