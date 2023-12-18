@@ -15,6 +15,7 @@ library(xportr)
 library(readr)
 
 library(pharmaversesdtm) # Contains example datasets from the CDISC pilot project or simulated
+library(pharmaverseadam) # Contains example adam datasets from the CDISC pilot project
 # ---- Load Specs for Metacore ----
 
 metacore <- suppressWarnings(spec_to_metacore("pk_spec.xlsx")) %>%
@@ -32,8 +33,7 @@ data("ex")
 data("vs")
 data("lb")
 
-data("admiral_adsl")
-adsl <- admiral_adsl
+data("adsl")
 
 ex <- convert_blanks_to_na(ex)
 pc <- convert_blanks_to_na(pc)
