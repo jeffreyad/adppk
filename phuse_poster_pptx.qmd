@@ -71,18 +71,6 @@ Published October 6, 2023!
 | `NPRLT`  | Nominal Rel Time from Previous Dose |
 | `APRLT`  | Actual Rel Time from Previous Dose  |
 
-![](images/Time_grid.png)
-
-## Time Variables Example
-
-| `USUBJID` | `EVID` | `NFRLT` | `AFRLT` | `NPRLT` | `ARRLT` |
-|-----------|--------|---------|---------|---------|---------|
-| 001       | 0      | 0       | -0.05   | 0       | -0.05   |
-| 001       | 1      | 0       | 0       | 0       | 0       |
-| 001       | 0      | 0.5     | 0.465   | 0.5     | 0.465   |
-| 001       | 0      | 3       | 2.89    | 3       | 2.89    |
-| 001       | 1      | 24      | 24.05   | 0       | 0       |
-| 001       | 0      | 25      | 25.15   | 1       | 1.15    |
 
 ## `ADPPK` Expected Variables
 
