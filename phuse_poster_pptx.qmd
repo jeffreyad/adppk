@@ -7,7 +7,7 @@ format: pptx
 
 ## Abstract
 
-Population Pharmacokinetic modeling is an important tool for drug development. The CDISC ADaM Population PK Implementation Guide is forthcoming. Population PK models generally make use of nonlinear mixed effects models that require numeric variables. The data used in the models will include both dosing and concentration records, relative time variables, and numeric covariate variables. {admiral} is an open-source R package for creating CDISC ADaM data. It can be used effectively to create Population PK analysis data (ADPPK). Additional tools from other Pharmaverse packages such as {metacore}, {metatools} and {xportr} can be used to simplify the workflow. I will discuss some of the challenges of Population Pharmacokinetic analysis data programming and show some of the solutions developed in {admiral} and the Pharmaverse.
+Population Pharmacokinetic modeling is an important tool for drug development. The CDISC ADaM Population PK Implementation Guide was released on October 6, 2023. Population PK models generally make use of nonlinear mixed effects models that require numeric variables. The data used in the models will include both dosing and concentration records, relative time variables, and numeric covariate variables. {admiral} is an open-source R package for creating CDISC ADaM data. It can be used effectively to create Population PK analysis data (ADPPK). Additional tools from other Pharmaverse packages such as {metacore}, {metatools} and {xportr} can be used to simplify the workflow. I will discuss some of the challenges of Population Pharmacokinetic analysis data programming and show some of the solutions developed in {admiral} and the Pharmaverse.
 
 ## Agenda
 
@@ -207,6 +207,14 @@ pc_dates <- pc %>%
 ```{r echo=TRUE}
 #| label: Expand
 #| code-line-numbers: "|2-17"
+
+ex_vars <- exprs(
+  STUDYID, USUBJID, EVID, EXDOSFRQ, EXDOSFRM,
+  NFRLT, EXDOSE, EXDOSU, EXTRT, ASTDT, ASTDTM, AENDT, AENDTM,
+  VISIT, VISITNUM, VISITDY, TRT01A, TRT01P, DOMAIN, EXSEQ,
+  !!!adsl_vars
+)
+
 ex_exp <- ex_dates %>%
   create_single_dose_dataset(
     dose_freq = EXDOSFRQ,
@@ -217,12 +225,7 @@ ex_exp <- ex_dates %>%
     nominal_time = NFRLT,
     lookup_table = dose_freq_lookup,
     lookup_column = CDISC_VALUE,
-    keep_source_vars = exprs(
-      STUDYID, USUBJID, EVID, EXDOSFRQ, EXDOSFRM,
-      NFRLT, EXDOSE, EXDOSU, EXTRT, ASTDT, ASTDTM, AENDT, AENDTM,
-      VISIT, VISITNUM, VISITDY,
-      TRT01A, TRT01P, DOMAIN, EXSEQ, !!!adsl_vars
-    )
+    keep_source_vars = ex_vars
   ) %>%
   # Derive AVISIT based on nominal relative time
   # Derive AVISITN to nominal time in whole days using integer division
@@ -275,7 +278,9 @@ adppk_prev <- adppk_first_dose %>%
     by_vars = exprs(USUBJID),
     order = exprs(ADTM),
     new_vars = exprs(
-      ADTM_prev = ADTM, EXDOSE_prev = EXDOSE, AVISIT_prev = AVISIT,
+      ADTM_prev = ADTM,
+      EXDOSE_prev = EXDOSE,
+      AVISIT_prev = AVISIT,
       AENDTM_prev = AENDTM
     ),
     join_vars = exprs(ADTM),
