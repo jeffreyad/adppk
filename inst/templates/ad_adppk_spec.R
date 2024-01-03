@@ -111,10 +111,12 @@ ex_dates <- ex %>%
 # ---- Expand dosing records between start and end dates ----
 # Updated function includes nominal_time parameter
 
-ex_vars <- exprs(STUDYID, USUBJID, EVID, EXDOSFRQ, EXDOSFRM,
-                 NFRLT, EXDOSE, EXDOSU, EXTRT, ASTDT, ASTDTM, AENDT, AENDTM,
-                 VISIT, VISITNUM, VISITDY, TRT01A, TRT01P, DOMAIN, EXSEQ, 
-                 !!!adsl_vars)
+ex_vars <- exprs(
+  STUDYID, USUBJID, EVID, EXDOSFRQ, EXDOSFRM,
+  NFRLT, EXDOSE, EXDOSU, EXTRT, ASTDT, ASTDTM, AENDT, AENDTM,
+  VISIT, VISITNUM, VISITDY, TRT01A, TRT01P, DOMAIN, EXSEQ,
+  !!!adsl_vars
+)
 
 ex_exp <- ex_dates %>%
   create_single_dose_dataset(
@@ -174,8 +176,10 @@ adppk_prev <- adppk_first_dose %>%
     by_vars = exprs(USUBJID),
     order = exprs(ADTM),
     new_vars = exprs(
-      ADTM_prev = ADTM, EXDOSE_prev = EXDOSE, 
-      AVISIT_prev = AVISIT, AENDTM_prev = AENDTM
+      ADTM_prev = ADTM,
+      EXDOSE_prev = EXDOSE,
+      AVISIT_prev = AVISIT,
+      AENDTM_prev = AENDTM
     ),
     join_vars = exprs(ADTM),
     join_type = "all",
