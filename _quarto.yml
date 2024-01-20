@@ -26,6 +26,7 @@ website:
       - PK_programming_pharmaverse.qmd
       - phuse_poster.qmd
       - phuse_poster_pptx.qmd
+      - phuse_poster_paper.qmd
 
   favicon: images/pharmaverse-favicon.png
   
