@@ -18,15 +18,45 @@ Pharmacokinetics considers the effect of the body on a drug. Typically samples a
 
 The Population PK Analysis Data (ADPPK) follows the CDISC Implementation Guide (<https://www.cdisc.org/standards/foundational/adam/basic-data-structure-adam-poppk-implementation-guide-v1-0>). Population PK models generally make use of nonlinear mixed effects models that require numeric variables. The data used in the models will include both dosing and concentration records, relative time variables, and numeric covariate variables. A `DV` or dependent variable is often expected. This is equivalent to the ADaM `AVAL` variable and will be included in addition to `AVAL` for ADPPK.
 
+## Time Variables (`ADPPK`)
+
+| Variable | Variable Label                      |
+|----------|-------------------------------------|
+| `NFRLT`  | Nominal Rel Time from First Dose    |
+| `AFRLT`  | Actual Rel Time from First Dose     |
+| `NPRLT`  | Nominal Rel Time from Previous Dose |
+| `APRLT`  | Actual Rel Time from Previous Dose  |
+
+## `ADPPK` Covariates
+
+-   `<COV>BL` for baseline covariate, (e.g., `WTBL`, `BMIBL`)
+-   `<COV>N` for numerical version of categorical covariate (e.g., `SEXN`, `RACEN`)
+-   `<COV>I` for any covariates with imputed values (e.g., `WTI`, `BMII`)
+-   `<COV>GRy` for grouping covariates (e.g. `AGEGR1`)
+
+
 ## `{admiral}`
 
 {admiral} is an open-source R package for creating CDISC analysis datasets. It is modular and consists of a set of functions for many of the operations required for dataset construction. There are template programs available for most CDISC ADaM datasets including for PK (i.e. ADPPK, ADNCA and ADPP). The table to the right shows the functions used in the creation of the ADPPK dataset. Follow the link in the QR code below to see an ADPPK template example and run the code in Posit Cloud.
 
-[![Pharmaverse Examples](images/ExamplesQR.png)](https://pharmaverse.github.io/examples/adam/adppk.html)
+## `{admiral}` Functions Used
 
-The following steps are included in the programming workflow.
+-   `derive_vars_dtm()`
+-   `derive_vars_dtm_to_dt()`
+-   `derive_vars_dtm_to_tm()`
+-   `derive_vars_dy()`
+-   `derive_vars_duration()`
+-   `create_single_dose_dataset()`
+-   `derive_vars_merged()`
+-   `derive_vars_joined()`
+-   `derive_vars_transposed()`
+-   `compute_bmi()`
+-   `compute_bsa()`
+-   `compute_egfr()`
 
--   Load packages
+
+## Programming Workflow.
+
 -   Load Specs with {metacore}
 -   Derive PC Dates
 -   Expand Dosing Records
@@ -37,28 +67,26 @@ The following steps are included in the programming workflow.
 -   {metacore} Checks
 -   {xportr} Steps
 
-## First Load Packages
 
-First we will load the packages required for our project. We will use `{admiral}` for the creation of analysis data. `{admiral}` requires `{dplyr}`, `{lubridate}` and `{stringr}`. We will use `{metacore}` and `{metatools}` to store and manipulate metadata from our specifications. We will use `{xportr}` to perform checks on the final data and export to a transport file.
+```{r echo=FALSE, message=FALSE}
+#| label: Setup
 
-The source SDTM data will come from the CDISC pilot study data stored in `{pharmaversesdtm}`.
+library(admiraldev)
+source("inst/templates/ad_adppk_spec.R")
 
-```{r echo=TRUE, message=FALSE}
-#| label: Load Packages
-# Load Packages
-library(admiral)
-library(dplyr)
-library(lubridate)
-library(stringr)
-library(metacore)
-library(metatools)
-library(xportr)
-library(readr)
-library(pharmaversesdtm)
-library(pharmaverseadam)
+print_df <- function(dataset, display_vars = NULL) {
+  display_vars <- assert_vars(display_vars, optional = TRUE)
+  assert_data_frame(dataset, required_vars = display_vars)
+
+  out <- dataset %>%
+    select(!!!display_vars)
+
+
+  head(out, n = 20)
+}
 ```
 
-## Next Load Specifications for `{metacore}`
+## Load Specifications for `{metacore}`
 
 We have saved our specifications in an Excel file and will load them into `{metacore}` with the `metacore::spec_to_metacore()` function. The spec file can be found [here](https://github.com/pharmaverse/examples/blob/main/adam/pk_spec.xlsx){target="_blank"}
 
@@ -69,29 +97,6 @@ We have saved our specifications in an Excel file and will load them into `{meta
 metacore <- spec_to_metacore("pk_spec.xlsx") %>%
   select_dataset("ADPPK")
 ```
-
-## Load Source Datasets
-
-We will load are SDTM data from `{pharmaversesdtm}`. The main components of this will be exposure data from `EX` and pharmacokinetic concentration data from `PC`. We will use `ADSL` for baseline characteristics and we will derive additional baselines from vital signs `VS` and laboratory data `LB`.
-
-```{r}
-#| label: Load Source
-# ---- Load source datasets ----
-# Load PC, EX, VS, LB and ADSL
-data("pc")
-data("ex")
-data("vs")
-data("lb")
-
-data("adsl")
-
-ex <- convert_blanks_to_na(ex)
-pc <- convert_blanks_to_na(pc)
-vs <- convert_blanks_to_na(vs)
-lb <- convert_blanks_to_na(lb)
-```
-
-## Derivations
 
 ### Derive PC Dates
 
@@ -138,51 +143,6 @@ pc_dates <- pc %>%
     DRUG = PCTEST,
     NFRLT = if_else(PCTPTNUM < 0, 0, PCTPTNUM), .after = USUBJID
   )
-```
-
-### Get Dosing Information
-
-Next we will also join `ADSL` data with `EX` and derive dates/times. This section uses the `{admiral}` functions `derive_vars_merged()`, `derive_vars_dtm()`, and `derive_vars_dtm_to_dt()`. Time is imputed to 00:00:00 here for reasons specific to the sample data. Other imputation times may be used based on study details. Here we create `NFRLT` for `EX` data based on `VISITDY` using the formula `(VISITDY - 1) * 24` using `dplyr::mutate`.
-
-```{r}
-#| label: Dosing
-# ---- Get dosing information ----
-
-ex_dates <- ex %>%
-  derive_vars_merged(
-    dataset_add = adsl,
-    new_vars = adsl_vars,
-    by_vars = exprs(STUDYID, USUBJID)
-  ) %>%
-  # Keep records with nonzero dose
-  filter(EXDOSE > 0) %>%
-  # Add time and set missing end date to start date
-  # Impute missing time to 00:00:00
-  # Note all times are missing for dosing records in this example data
-  # Derive Analysis Start and End Dates
-  derive_vars_dtm(
-    new_vars_prefix = "AST",
-    dtc = EXSTDTC,
-    time_imputation = "00:00:00"
-  ) %>%
-  derive_vars_dtm(
-    new_vars_prefix = "AEN",
-    dtc = EXENDTC,
-    time_imputation = "00:00:00"
-  ) %>%
-  # Derive event ID and nominal relative time from first dose (NFRLT)
-  mutate(
-    EVID = 1,
-    NFRLT = 24 * (VISITDY - 1), .after = USUBJID
-  ) %>%
-  # Set missing end dates to start date
-  mutate(AENDTM = case_when(
-    is.na(AENDTM) ~ ASTDTM,
-    TRUE ~ AENDTM
-  )) %>%
-  # Derive dates from date/times
-  derive_vars_dtm_to_dt(exprs(ASTDTM)) %>%
-  derive_vars_dtm_to_dt(exprs(AENDTM))
 ```
 
 ### Expand Dosing Records
@@ -302,157 +262,6 @@ adppk_nom_prev <- adppk_prev %>%
   )
 ```
 
-### Combine PC and EX Data
-
-Here we combine `PC` and `EX` records. We will derive the relative time variables `AFRLT` (Actual Relative Time from First Dose), `APRLT` (Actual Relative Time from Previous Dose), and `NPRLT` (Nominal Relative Time from Previous Dose). Use `derive_vars_duration()` to derive `AFRLT` and `APRLT`. Note we defined `EVID` above with values of 0 for observation records and 1 for dosing records.
-
-```{r}
-#| label: Combine
-# ---- Combine ADPPK and EX data ----
-# Derive Relative Time Variables
-
-adppk_aprlt <- bind_rows(adppk_nom_prev, ex_exp) %>%
-  group_by(USUBJID, DRUG) %>%
-  mutate(
-    FANLDTM = min(FANLDTM, na.rm = TRUE),
-    min_NFRLT = min(NFRLT, na.rm = TRUE),
-    maxdate = max(ADT[EVID == 0], na.rm = TRUE), .after = USUBJID
-  ) %>%
-  arrange(USUBJID, ADTM) %>%
-  ungroup() %>%
-  filter(ADT <= maxdate) %>%
-  # Derive Actual Relative Time from First Dose (AFRLT)
-  derive_vars_duration(
-    new_var = AFRLT,
-    start_date = FANLDTM,
-    end_date = ADTM,
-    out_unit = "hours",
-    floor_in = FALSE,
-    add_one = FALSE
-  ) %>%
-  # Derive Actual Relative Time from Reference Dose (APRLT)
-  derive_vars_duration(
-    new_var = APRLT,
-    start_date = ADTM_prev,
-    end_date = ADTM,
-    out_unit = "hours",
-    floor_in = FALSE,
-    add_one = FALSE
-  ) %>%
-  # Derive APRLT
-  mutate(
-    APRLT = case_when(
-      EVID == 1 ~ 0,
-      is.na(APRLT) ~ AFRLT,
-      TRUE ~ APRLT
-    ),
-    NPRLT = case_when(
-      EVID == 1 ~ 0,
-      is.na(NFRLT_prev) ~ NFRLT - min_NFRLT,
-      TRUE ~ NFRLT - NFRLT_prev
-    )
-  )
-```
-
-### Derive Analysis Variables
-
-The expected analysis variable for `ADPPK` is `DV` or dependent variable. For this example `DV` is set to the numeric concentration value `PCSTRESN`. We will also include `AVAL` equivalent to `DV` for consistency with CDISC ADaM standards. `MDV` missing dependent variable will also be included.
-
-```{r}
-#| label: Analysis Variables
-# ---- Derive Analysis Variables ----
-# Derive actual dose DOSEA and planned dose DOSEP,
-# Derive AVAL and DV
-
-adppk_aval <- adppk_aprlt %>%
-  mutate(
-    # Derive Actual Dose
-    DOSEA = case_when(
-      EVID == 1 ~ EXDOSE,
-      is.na(EXDOSE_prev) ~ EXDOSE_first,
-      TRUE ~ EXDOSE_prev
-    ),
-    # Derive Planned Dose
-    DOSEP = case_when(
-      TRT01P == "Xanomeline High Dose" ~ 81,
-      TRT01P == "Xanomeline Low Dose" ~ 54,
-      TRT01P == "Placebo" ~ 0
-    ),
-    # Derive PARAMCD
-    PARAMCD = case_when(
-      EVID == 1 ~ "DOSE",
-      TRUE ~ PCTESTCD
-    ),
-    ALLOQ = PCLLOQ,
-    # Derive CMT
-    CMT = case_when(
-      EVID == 1 ~ 1,
-      TRUE ~ 2
-    ),
-    # Derive BLQFL/BLQFN
-    BLQFL = case_when(
-      PCSTRESC == "<BLQ" ~ "Y",
-      TRUE ~ "N"
-    ),
-    BLQFN = case_when(
-      PCSTRESC == "<BLQ" ~ 1,
-      TRUE ~ 0
-    ),
-    AMT = case_when(
-      EVID == 1 ~ EXDOSE,
-      TRUE ~ NA_real_
-    ),
-    # Derive DV and AVAL
-    DV = PCSTRESN,
-    DVID = PCTESTCD,
-    AVAL = DV,
-    DVL = case_when(
-      DV != 0 ~ log(DV),
-      TRUE ~ NA_real_
-    ),
-    # Derive MDV
-    MDV = case_when(
-      EVID == 1 ~ 1,
-      is.na(DV) ~ 1,
-      TRUE ~ 0
-    ),
-    AVALU = case_when(
-      EVID == 1 ~ NA_character_,
-      TRUE ~ PCSTRESU
-    ),
-    RLTU = "h",
-    USTRESC = PCSTRESC,
-    UDTC = format_ISO8601(ADTM),
-    II = if_else(EVID == 1, 1, 0),
-    SS = if_else(EVID == 1, 1, 0),
-    ADDL = 0,
-    OCC = 1,
-  )
-```
-
-### Add ASEQ
-
-We add a sequence variable using the `{admiral}` function `derive_var_obs_number()`.
-
-```{r}
-#| label: ASEQ
-# ---- Add ASEQ ----
-
-adppk_aseq <- adppk_aval %>%
-  # Calculate ASEQ
-  derive_var_obs_number(
-    new_var = ASEQ,
-    by_vars = exprs(STUDYID, USUBJID),
-    order = exprs(AFRLT, EVID),
-    check_type = "error"
-  ) %>%
-  mutate(
-    PROJID = DRUG,
-    PROJIDN = 1,
-    PART = 1,
-  )
-```
-
 ## Derive Covariates Using Metacore
 
 In this step we will create our numeric covariates using the `create_var_from_codelist()` function from `{metatools}`.
@@ -486,81 +295,6 @@ covar <- adsl %>%
   create_var_from_codelist(metacore, input_var = FORM, out_var = FORMN) %>%
   create_var_from_codelist(metacore, input_var = ROUTE, out_var = ROUTEN) %>%
   create_var_from_codelist(metacore, input_var = SUBJTYPC, out_var = SUBJTYP)
-```
-
-### Derive Additional Baselines
-
-Next we add additional baselines from vital signs and laboratory data. We will use the `{admiral}` functions `derive_vars_merged()` and `derive_vars_transposed()` to add these.
-
-```{r}
-#| label: Baselines
-#---- Derive additional baselines from VS and LB ----
-
-labsbl <- lb %>%
-  filter(LBBLFL == "Y" & LBTESTCD %in% c("CREAT", "ALT", "AST", "BILI")) %>%
-  mutate(LBTESTCDB = paste0(LBTESTCD, "BL")) %>%
-  select(STUDYID, USUBJID, LBTESTCDB, LBSTRESN)
-
-covar_vslb <- covar %>%
-  derive_vars_merged(
-    dataset_add = vs,
-    filter_add = VSTESTCD == "HEIGHT",
-    by_vars = exprs(STUDYID, USUBJID),
-    new_vars = exprs(HTBL = VSSTRESN)
-  ) %>%
-  derive_vars_merged(
-    dataset_add = vs,
-    filter_add = VSTESTCD == "WEIGHT" & VSBLFL == "Y",
-    by_vars = exprs(STUDYID, USUBJID),
-    new_vars = exprs(WTBL = VSSTRESN)
-  ) %>%
-  derive_vars_transposed(
-    dataset_merge = labsbl,
-    by_vars = exprs(STUDYID, USUBJID),
-    key_var = LBTESTCDB,
-    value_var = LBSTRESN
-  ) %>%
-  mutate(
-    BMIBL = compute_bmi(height = HTBL, weight = WTBL),
-    BSABL = compute_bsa(
-      height = HTBL,
-      weight = HTBL,
-      method = "Mosteller"
-    ),
-    CRCLBL = compute_egfr(
-      creat = CREATBL, creatu = "SI", age = AGE, weight = WTBL, sex = SEX,
-      method = "CRCL"
-    ),
-    EGFRBL = compute_egfr(
-      creat = CREATBL, creatu = "SI", age = AGE, weight = WTBL, sex = SEX,
-      method = "CKD-EPI"
-    )
-  ) %>%
-  rename(TBILBL = BILIBL)
-```
-
-### Combine with Covariates
-
-We combine our covariates with the rest of the data
-
-```{r}
-#| label: Combine with Covariates
-# Combine covariates with APPPK data
-
-adppk_prefinal <- adppk_aseq %>%
-  derive_vars_merged(
-    dataset_add = select(covar_vslb, !!!negate_vars(adsl_vars)),
-    by_vars = exprs(STUDYID, USUBJID)
-  ) %>%
-  arrange(STUDYIDN, USUBJIDN, AFRLT, EVID) %>%
-  # Add RECSEQ
-  # Exclude records if needed
-  mutate(
-    RECSEQ = row_number(),
-    EXCLFCOM = "None"
-  ) %>%
-  create_var_from_codelist(metacore, input_var = DVID, out_var = DVIDN) %>%
-  create_var_from_codelist(metacore, input_var = EXCLFCOM, out_var = EXCLF)
 ```
 
 ## Check Data With Metacore
@@ -600,19 +334,6 @@ adppk_xpt <- adppk %>%
   xportr_format(metacore) %>% # Assigns variable format from metacore specifications
   xportr_df_label(metacore) %>% # Assigns dataset label from metacore specifications
   xportr_write(file.path(dir, "adppk.xpt")) # Write xpt v5 transport file
-```
-
-## Save Final Output
-
-Finally we save the final output. We will also create a `CSV` file for the modeler.
-
-```{r}
-#| label: Save
-# ---- Save output ----
-saveRDS(adppk, file = file.path(dir, "adppk.rds"), compress = "bzip2")
-
-# Write CSV
-write_csv(adppk_xpt, "./output/adppk.csv")
 ```
 
 # Example Scripts {#example}
