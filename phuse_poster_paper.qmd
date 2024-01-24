@@ -1,24 +1,27 @@
 ---
 title: "Population Pharmacokinetic Analysis Data (ADPPK) Programming in `{admiral}` and the Pharmaverse"
-author: "Jeffrey Dickinson, Navitas Data Sciences"
+author: "Jeffrey Dickinson, Navitas Data Sciences, Pottstown, PA, USA"
 format:
-  pdf:
+  docx:
     toc: false
-    number-sections: true
+    header: "Paper PP01"
+    number-sections: false
     colorlinks: true
 ---
 
-## Abstract
+# Abstract
 
-Population Pharmacokinetic modeling is an important tool for drug development. The CDISC ADaM Population PK Implementation Guide was released on October 6, 2023. Population PK models generally make use of nonlinear mixed effects models that require numeric variables. The data used in the models will include both dosing and concentration records, relative time variables, and numeric covariate variables. {admiral} is an open-source R package for creating CDISC ADaM data. It can be used effectively to create Population PK analysis data (ADPPK). Additional tools from other Pharmaverse packages such as {metacore}, {metatools} and {xportr} can be used to simplify the workflow. I will discuss some of the challenges of Population Pharmacokinetic analysis data programming and show some of the solutions developed in {admiral} and the Pharmaverse.
+Population Pharmacokinetic modeling is an important tool for drug development. The CDISC ADaM Population PK Implementation Guide was released on October 6, 2023. Population PK models generally make use of nonlinear mixed effects models that require numeric variables. The data used in the models will include both dosing and concentration records, relative time variables, and numeric covariate variables. `{admiral}` is an open-source R package for creating CDISC ADaM data. It can be used effectively to create Population PK analysis data (ADPPK). Additional tools from other Pharmaverse packages such as `{metacore}`, `{metatools}` and `{xportr}` can be used to simplify the workflow. I will discuss some of the challenges of Population Pharmacokinetic analysis data programming and show some of the solutions developed in `{admiral}` and the Pharmaverse.
 
-## Introduction
+# Introduction
 
-Pharmacokinetics considers the effect of the body on a drug. Typically samples are drawn at set time intervals after dose administration as illustrated in the schematic above. The resulting concentration profiles can be analyzed. With population pharmacokinetic models, variations within and between populations can be assessed. The CDISC ADaM Population PK Analysis Data Implementation Guide was released on October 6, 2023. Population PK models generally make use of nonlinear mixed effects models that require numeric variables. The data used in the models will include both dosing and concentration records, relative time variables, and numeric covariate variables. A DV or dependent variable is often expected, typically the concentration. This is equivalent to the ADaM AVAL variable and will be included in addition to AVAL for ADPPK. The relative time variables are listed in the table below. Also below are the expected variables unique to ADPPK and the numeric covariates.
+Pharmacokinetics considers the effect of the body on a drug. Typically samples are drawn at set time intervals after dose administration. The resulting concentration profiles can be analyzed. With population pharmacokinetic models, variations within and between populations can be assessed. The CDISC ADaM Population PK Analysis Data Implementation Guide was released on October 6, 2023. (<https://www.cdisc.org/standards/foundational/adam/basic-data-structure-adam-poppk-implementation-guide-v1-0>) 
 
-The Population PK Analysis Data (ADPPK) follows the CDISC Implementation Guide (<https://www.cdisc.org/standards/foundational/adam/basic-data-structure-adam-poppk-implementation-guide-v1-0>). Population PK models generally make use of nonlinear mixed effects models that require numeric variables. The data used in the models will include both dosing and concentration records, relative time variables, and numeric covariate variables. A `DV` or dependent variable is often expected. This is equivalent to the ADaM `AVAL` variable and will be included in addition to `AVAL` for ADPPK.
+Population PK models generally make use of nonlinear mixed effects models that require numeric variables. The data used in the models will include both dosing and concentration records, relative time variables, and numeric covariate variables. A DV or dependent variable is often expected, typically the concentration. This is equivalent to the ADaM AVAL variable and will be included in addition to AVAL for ADPPK. The relative time variables are listed in the table below. Also below are the expected variables unique to ADPPK and examples of the numeric covariates.
 
 ## Time Variables (`ADPPK`)
+
+These are the names for the relative time variables:
 
 | Variable | Variable Label                      |
 |----------|-------------------------------------|
@@ -27,17 +30,31 @@ The Population PK Analysis Data (ADPPK) follows the CDISC Implementation Guide (
 | `NPRLT`  | Nominal Rel Time from Previous Dose |
 | `APRLT`  | Actual Rel Time from Previous Dose  |
 
+## Expected Variables (`ADPPK`)
+
+These variables are expected in `ADPPK`:
+
+| Variable | Variable Label                      |
+|----------|-------------------------------------|
+| `EVID`   | Event ID                            |
+| `DV`     | Dependent Variable                  |
+| `MDV`    | Missing Dependent Variable          |
+| `BLQFL/N`| Below Lower Limit of Quant Flag     |
+
 ## `ADPPK` Covariates
 
--   `<COV>BL` for baseline covariate, (e.g., `WTBL`, `BMIBL`)
--   `<COV>N` for numerical version of categorical covariate (e.g., `SEXN`, `RACEN`)
--   `<COV>I` for any covariates with imputed values (e.g., `WTI`, `BMII`)
--   `<COV>GRy` for grouping covariates (e.g. `AGEGR1`)
+These are the conventions for the numeric covariates:
 
+| Covariate  | Covariate Example                                                |
+|------------|------------------------------------------------------------------|
+| `<COV>BL`  | Baseline covariate, (e.g., `WTBL`, `BMIBL`)                      |
+| `<COV>N`   | Numeric version of categorical covariate (e.g., `SEXN`, `RACEN`) |
+| `<COV>I`   | Covariates with imputed values (e.g., `WTI`, `BMII`)             |
+| `<COV>GRy` | Grouping covariates (e.g. `AGEGR1`                               |
 
-## `{admiral}`
+# `{admiral}`
 
-{admiral} is an open-source R package for creating CDISC analysis datasets. It is modular and consists of a set of functions for many of the operations required for dataset construction. There are template programs available for most CDISC ADaM datasets including for PK (i.e. ADPPK, ADNCA and ADPP). The table to the right shows the functions used in the creation of the ADPPK dataset. Follow the link in the QR code below to see an ADPPK template example and run the code in Posit Cloud.
+`{admiral}` is an open-source R package for creating CDISC analysis datasets. It is modular and consists of a set of functions for many of the operations required for dataset construction. There are template programs available for most CDISC ADaM datasets including for PK (i.e. ADPPK, ADNCA and ADPP). The `{admiral}` functions used are listed below:
 
 ## `{admiral}` Functions Used
 
@@ -54,19 +71,29 @@ The Population PK Analysis Data (ADPPK) follows the CDISC Implementation Guide (
 -   `compute_bsa()`
 -   `compute_egfr()`
 
+## Pharmaverse
 
-## Programming Workflow.
+In addition to `{admiral}` I will use several other packages from the Pharmaverse [https://pharmaverse.org/](https://pharmaverse.org/){target="_blank"} which is collaborative effort across companies and people to create a curated set of packages for clinical reporting.  I am using the following additional packages:
 
--   Load Specs with {metacore}
+-   `{pharmaversesdtm}` Sample CDISC SDTM data
+-   `{pharmaverseadam}` Sample CDISC analysis data
+-   `{metacore}` Create and manage metadata for the analysis data
+-   `{metatools}` Work with metadata to derive variables and perform checks
+-   `{xportr}` Perform checks on data and export to transport file
+
+# Programming Workflow.
+
+The complete programming workflow for building the ADPPK analysis dataset can be found on the Pharmaverse examples website [https://pharmaverse.github.io/examples/adam/adppk.html](https://pharmaverse.github.io/examples/adam/adppk.html){target="_blank"}. I will highlight the following steps here:
+
+-   Load Specs with `{metacore}`
 -   Derive PC Dates
 -   Expand Dosing Records
 -   Find First Dose
 -   Find Previous Dose
 -   Find Previous Nominal Dose
--   Derive Covariates Using {metacore}
--   {metacore} Checks
--   {xportr} Steps
-
+-   Derive Covariates Using `{metacore}`
+-   `{metacore}` Checks
+-   `{xportr}` Steps
 
 ```{r echo=FALSE, message=FALSE}
 #| label: Setup
@@ -89,7 +116,7 @@ print_df <- function(dataset, display_vars = NULL) {
 
 ## Load Specifications for `{metacore}`
 
-We have saved our specifications in an Excel file and will load them into `{metacore}` with the `metacore::spec_to_metacore()` function. The spec file can be found [here](https://github.com/pharmaverse/examples/blob/main/adam/pk_spec.xlsx){target="_blank"}
+There is a sample specification file for ADPPK which can be loaded into `{metacore}`. The file is loaded into `{metacore}` with the `metacore::spec_to_metacore()` function. The spec file can be found [here](https://github.com/pharmaverse/examples/blob/main/adam/pk_spec.xlsx){target="_blank"}.
 
 ```{r echo=TRUE, message=FALSE}
 #| label: Load Specs
@@ -99,9 +126,9 @@ metacore <- spec_to_metacore("pk_spec.xlsx") %>%
   select_dataset("ADPPK")
 ```
 
-### Derive PC Dates
+## Derive PC Dates
 
-At this step, it may be useful to join `ADSL` to your `PC` and `EX` domains as well. Only the `ADSL` variables used for derivations are selected at this step. The rest of the relevant `ADSL` variables will be added later. In this case we will keep `TRTSDT`/`TRTSDTM` for day derivation and `TRT01P`/`TRT01A` for planned and actual treatments.
+One of the first things done after loading the SDTM domains is to convert character dates to numeric. We will also combine some variables from `ADSL` at this step. Only the `ADSL` variables used for derivations are selected at this step. The rest of the relevant `ADSL` variables will be added later. In this case we will keep `TRTSDT`/`TRTSDTM` for day derivation and `TRT01P`/`TRT01A` for planned and actual treatments.
 
 In this segment we will use `admiral::derive_vars_merged()` to join the `ADSL` variables and the following `{admiral}` functions to derive analysis dates, times and days:
 
@@ -144,7 +171,7 @@ pc_dates <- pc %>%
   )
 ```
 
-### Expand Dosing Records
+## Expand Dosing Records
 
 The function `admiral::create_single_dose_dataset()` will be used to expand dosing records between the start date and end date. The nominal time will also be expanded based on the values of `EXDOSFRQ`, for example "QD" will result in nominal time being incremented by 24 hours and "BID" will result in nominal time being incremented by 12 hours.
 
@@ -186,7 +213,7 @@ ex_exp <- ex_dates %>%
   derive_vars_dtm_to_tm(exprs(AENDTM))
 ```
 
-### Find First Dose
+## Find First Dose
 
 We find the first dose for the concentration records using the function `admiral::derive_vars_merged()`
 
@@ -214,9 +241,9 @@ adppk_first_dose <- pc_dates %>%
   )
 ```
 
-### Find Previous Dose
+## Find Previous Dose
 
-For `ADPPK` we will find the previous dose with respect to actual time and nominal time. We will use `admiral::derive_vars_joined().
+For `ADPPK` we will find the previous dose with respect to actual time and nominal time. We will use `admiral::derive_vars_joined()`.
 
 ```{r}
 #| label: Previous Dose
@@ -240,9 +267,9 @@ adppk_prev <- adppk_first_dose %>%
   )
 ```
 
-### Find Previous Nominal Dose
+## Find Previous Nominal Dose
 
-Here we use `admiral::derive_vars_joined()` to also find the previous nominal dose.  
+Here we use `admiral::derive_vars_joined()` to also find the previous nominal dose.
 
 ```{r}
 #| label: Previous Nominal Dose
@@ -263,7 +290,7 @@ adppk_nom_prev <- adppk_prev %>%
   )
 ```
 
-## Derive Covariates Using Metacore
+## Derive Covariates Using `{metacore}`
 
 In this step we will create our numeric covariates using the `metatools::create_var_from_codelist()` function.
 
@@ -298,7 +325,7 @@ covar <- adsl %>%
   create_var_from_codelist(metacore, input_var = SUBJTYPC, out_var = SUBJTYP)
 ```
 
-## Check Data With Metacore
+## Check Data With `{metacore}`
 
 We use `{metacore}` to perform a number of checks on the data. We will drop variables not in the specs and make sure all the variables from the specs are included.
 
@@ -308,48 +335,49 @@ We use `{metacore}` to perform a number of checks on the data. We will drop vari
 # Final Steps, Select final variables and Add labels
 # This process will be based on your metadata, no example given for this reason
 # ...
-
-
 # Apply metadata and perform associated checks ----
 # uses {metatools}
 
 adppk <- adppk_prefinal %>%
   drop_unspec_vars(metacore) %>% # Drop unspecified variables from specs
-  check_variables(metacore) %>% # Check all variables specified are present and no more
-  check_ct_data(metacore) %>% # Checks all variables with CT only contain values within the CT
+  check_variables(metacore) %>% # Check all variables specified are present
+  check_ct_data(metacore) %>% # Checks Control Terminology
   order_cols(metacore) %>% # Orders the columns according to the spec
   sort_by_key(metacore) # Sorts the rows by the sort keys
 ```
 
-## Apply Labels and Formats with xportr
+## Apply Labels and Formats with `{xportr}`
 
-Using {xportr} we check variable type, assign variable lenght, add variable labels, add variable formats, and save a transport file.
+Using `{xportr}` we check variable type, assign variable length, add variable labels, add variable formats, and save a transport file.
 
 ```{r}
 #| label: xportr
 
 adppk_xpt <- adppk %>%
   xportr_type(metacore) %>% # Coerce variable type to match spec
-  xportr_length(metacore) %>% # Assigns SAS length from a variable level metadata
-  xportr_label(metacore) %>% # Assigns variable label from metacore specifications
-  xportr_format(metacore) %>% # Assigns variable format from metacore specifications
-  xportr_df_label(metacore) %>% # Assigns dataset label from metacore specifications
+  xportr_length(metacore) %>% # Assigns SAS length from a variable metadata
+  xportr_label(metacore) %>% # Assigns variable label from specifications
+  xportr_format(metacore) %>% # Assigns variable format from specifications
+  xportr_df_label(metacore) %>% # Assigns dataset label from specifications
   xportr_write(file.path(dir, "adppk.xpt")) # Write xpt v5 transport file
 ```
 
 # Conclusions
 
-Analsis data standards for Population PK (ADPPK) have been recently released.  Within a few years submissions to regulatory agencies such as the FDA may require submissions of ADPPK analysis data.  As we begin to see submissions programmed in R the use of packages such as {admiral} will become more widespread.  The code presented here shows that `{admiral}` and other Pharmaverse packages provide an excellent way to program ADPPK analysis data.
+Analysis data standards for Population PK (ADPPK) have been recently released. Within a few years submissions to regulatory agencies such as the FDA may require submissions of ADPPK analysis data. As we begin to see submissions programmed in R the use of packages such as `{admiral}` will become more widespread. The code presented here shows that `{admiral}` and other Pharmaverse packages provide an excellent way to program ADPPK analysis data.
 
 # Contact Information
 
-Your comments and questions are valued and encouraged.  Contact the author at:
+Your comments and questions are valued and encouraged. Contact the author at:
+
 Author Name: Jeffrey Dickinson
+
 Company: Navitas Data Sciences
-Address: 1610 Medical Drive, Suite 300, Pottstown, PA  19464 USA
-Work Phone:  : +1 402 319 9380
-Email: jeff.dickinson@navitaslifesciences.com
-Website: : www.navitaslifesciences.com
 
+Address: 1610 Medical Drive, Suite 300, Pottstown, PA 19464 USA
 
+Work Phone: +1 402 319 9380
 
+Email: jeff.dickinson\@navitaslifesciences.com
+
+Website: [www.navitaslifesciences.com](www.navitaslifesciences.com){target="_blank"}
