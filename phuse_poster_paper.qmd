@@ -15,7 +15,7 @@ Population Pharmacokinetic modeling is an important tool for drug development. T
 
 # Introduction
 
-Pharmacokinetics considers the effect of the body on a drug. Typically samples are drawn at set time intervals after dose administration. The resulting concentration profiles can be analyzed. With population pharmacokinetic models, variations within and between populations can be assessed. The CDISC ADaM Population PK Analysis Data Implementation Guide was released on October 6, 2023. (<https://www.cdisc.org/standards/foundational/adam/basic-data-structure-adam-poppk-implementation-guide-v1-0>) 
+Pharmacokinetics considers the effect of the body on a drug. Typically samples are drawn at set time intervals after dose administration. The resulting concentration profiles can be analyzed. With population pharmacokinetic models, variations within and between populations can be assessed. The CDISC ADaM Population PK Analysis Data Implementation Guide was released on October 6, 2023. (<https://www.cdisc.org/standards/foundational/adam/basic-data-structure-adam-poppk-implementation-guide-v1-0>)
 
 Population PK models generally make use of nonlinear mixed effects models that require numeric variables. The data used in the models will include both dosing and concentration records, relative time variables, and numeric covariate variables. A DV or dependent variable is often expected, typically the concentration. This is equivalent to the ADaM AVAL variable and will be included in addition to AVAL for ADPPK. The relative time variables are listed in the table below. Also below are the expected variables unique to ADPPK and examples of the numeric covariates.
 
@@ -34,19 +34,19 @@ These are the names for the relative time variables:
 
 These variables are expected in `ADPPK`:
 
-| Variable | Variable Label                      |
-|----------|-------------------------------------|
-| `EVID`   | Event ID                            |
-| `DV`     | Dependent Variable                  |
-| `MDV`    | Missing Dependent Variable          |
-| `BLQFL/N`| Below Lower Limit of Quant Flag     |
+| Variable  | Variable Label                  |
+|-----------|---------------------------------|
+| `EVID`    | Event ID                        |
+| `DV`      | Dependent Variable              |
+| `MDV`     | Missing Dependent Variable      |
+| `BLQFL/N` | Below Lower Limit of Quant Flag |
 
 ## `ADPPK` Covariates
 
 These are the conventions for the numeric covariates:
 
 | Covariate  | Covariate Example                                                |
-|------------|------------------------------------------------------------------|
+|---------------|--------------------------------------------------------|
 | `<COV>BL`  | Baseline covariate, (e.g., `WTBL`, `BMIBL`)                      |
 | `<COV>N`   | Numeric version of categorical covariate (e.g., `SEXN`, `RACEN`) |
 | `<COV>I`   | Covariates with imputed values (e.g., `WTI`, `BMII`)             |
@@ -73,7 +73,7 @@ These are the conventions for the numeric covariates:
 
 ## Pharmaverse
 
-In addition to `{admiral}` I will use several other packages from the Pharmaverse [https://pharmaverse.org/](https://pharmaverse.org/){target="_blank"} which is collaborative effort across companies and people to create a curated set of packages for clinical reporting.  I am using the following additional packages:
+In addition to `{admiral}` this poster will show several other packages from the Pharmaverse [https://pharmaverse.org/](https://pharmaverse.org/){target="_blank"}, which is collaborative effort across companies and people to create a curated set of packages for clinical reporting. I am using the following additional packages:
 
 -   `{pharmaversesdtm}` Sample CDISC SDTM data
 -   `{pharmaverseadam}` Sample CDISC analysis data
@@ -137,7 +137,7 @@ In this segment we will use `admiral::derive_vars_merged()` to join the `ADSL` v
 -   `derive_vars_dtm_to_tm()`
 -   `derive_vars_dy()`
 
-We will also create `NFRLT` for `PC` data based on `PCTPTNUM`. We will create an event ID (`EVID`) of 0 for concentration records and 1 for dosing records.
+We will also create nominal time from first dose (`NFRLT)` for `PC` data based on `PCTPTNUM`. We will create an event ID (`EVID`) of 0 for concentration records and 1 for dosing records.
 
 ```{r}
 #| label: PC Dates
@@ -215,7 +215,7 @@ ex_exp <- ex_dates %>%
 
 ## Find First Dose
 
-We find the first dose for the concentration records using the function `admiral::derive_vars_merged()`
+We find the first dose for the concentration records using the function `admiral::derive_vars_merged()`. Note that `mode = "first"` is used to select the first record by the order variables.
 
 ```{r}
 #| label: First Dose
@@ -243,7 +243,7 @@ adppk_first_dose <- pc_dates %>%
 
 ## Find Previous Dose
 
-For `ADPPK` we will find the previous dose with respect to actual time and nominal time. We will use `admiral::derive_vars_joined()`.
+For `ADPPK` we will find the previous dose with respect to actual time and nominal time. We will use `admiral::derive_vars_joined()`. In this case we use the `filter_join` parameter to select the last record before the date.
 
 ```{r}
 #| label: Previous Dose
@@ -269,7 +269,7 @@ adppk_prev <- adppk_first_dose %>%
 
 ## Find Previous Nominal Dose
 
-Here we use `admiral::derive_vars_joined()` to also find the previous nominal dose.
+Here we also use `admiral::derive_vars_joined()` to also find the previous nominal dose.
 
 ```{r}
 #| label: Previous Nominal Dose
