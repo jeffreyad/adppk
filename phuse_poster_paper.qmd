@@ -17,7 +17,7 @@ Population Pharmacokinetic modeling is an important tool for drug development. T
 
 Pharmacokinetics considers the effect of the body on a drug. Typically samples are drawn at set time intervals after dose administration. The resulting concentration profiles can be analyzed. With population pharmacokinetic models, variations within and between populations can be assessed. The CDISC ADaM Population PK Analysis Data Implementation Guide was released on October 6, 2023. (<https://www.cdisc.org/standards/foundational/adam/basic-data-structure-adam-poppk-implementation-guide-v1-0>)
 
-Population PK models generally make use of nonlinear mixed effects models that require numeric variables. The data used in the models will include both dosing and concentration records, relative time variables, and numeric covariate variables. A DV or dependent variable is often expected, typically the concentration. This is equivalent to the ADaM AVAL variable and will be included in addition to AVAL for ADPPK. The relative time variables are listed in the table below. Also below are the expected variables unique to ADPPK and examples of the numeric covariates.
+Population PK models generally make use of nonlinear mixed effects models that require numeric variables. The data used in the models will include both dosing and concentration records, relative time variables, and numeric covariate variables. A DV or dependent variable is often expected, typically the concentration. This is equivalent to the ADaM AVAL variable and will be included in addition to AVAL for ADPPK. The relative time variables are listed in the table below. Also below are the expected variables unique to ADPPK and examples of the numeric covariates. ADPPK follows the CDISC BDS ("Basic Data Structure") format.
 
 ## Time Variables (`ADPPK`)
 
@@ -46,7 +46,7 @@ These variables are expected in `ADPPK`:
 These are the conventions for the numeric covariates:
 
 | Covariate  | Covariate Example                                                |
-|---------------|--------------------------------------------------------|
+|------------------|------------------------------------------------------|
 | `<COV>BL`  | Baseline covariate, (e.g., `WTBL`, `BMIBL`)                      |
 | `<COV>N`   | Numeric version of categorical covariate (e.g., `SEXN`, `RACEN`) |
 | `<COV>I`   | Covariates with imputed values (e.g., `WTI`, `BMII`)             |
@@ -54,7 +54,7 @@ These are the conventions for the numeric covariates:
 
 # `{admiral}`
 
-`{admiral}` is an open-source R package for creating CDISC analysis datasets. It is modular and consists of a set of functions for many of the operations required for dataset construction. There are template programs available for most CDISC ADaM datasets including for PK (i.e. ADPPK, ADNCA and ADPP). The `{admiral}` functions used are listed below:
+`{admiral}` is an open-source R package for creating CDISC analysis datasets. It is modular and consists of a set of functions for many of the operations required for dataset construction. There are template programs available for most CDISC ADaM datasets including for PK (i.e. ADPPK, ADNCA and ADPP). See the `{admiral}` vignette for Creating a PK NCA or Population PK ADaM for more information [https://pharmaverse.github.io/admiral/articles/pk_adnca.html](https://pharmaverse.github.io/admiral/articles/pk_adnca.html){target="_blank"}. The `{admiral}` functions used for ADPPK are listed below:
 
 ## `{admiral}` Functions Used
 
@@ -365,6 +365,10 @@ adppk_xpt <- adppk %>%
 # Conclusions
 
 Analysis data standards for Population PK (ADPPK) have been recently released. Within a few years submissions to regulatory agencies such as the FDA may require submissions of ADPPK analysis data. As we begin to see submissions programmed in R the use of packages such as `{admiral}` will become more widespread. The code presented here shows that `{admiral}` and other Pharmaverse packages provide an excellent way to program ADPPK analysis data.
+
+Be sure to check out the Pharmaverse Examples website and try the code on Posit Cloud!
+
+[![](images/ExamplesQR.png){width="112"}](https://pharmaverse.github.io/examples/adam/adppk.html)
 
 # Contact Information
 
