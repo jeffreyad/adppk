@@ -15,9 +15,9 @@ Population Pharmacokinetic modeling is an important tool for drug development. T
 
 # Introduction
 
-Pharmacokinetics considers the effect of the body on a drug. Typically samples are drawn at set time intervals after dose administration. The resulting concentration profiles can be analyzed. With population pharmacokinetic models, variations within and between populations can be assessed. The CDISC ADaM Population PK Analysis Data Implementation Guide was released on October 6, 2023. (<https://www.cdisc.org/standards/foundational/adam/basic-data-structure-adam-poppk-implementation-guide-v1-0>)
+Pharmacokinetics considers the effect of the body on a drug. Typically samples are drawn at set time intervals after dose administration. The resulting concentration profiles can be analyzed to see how the drug is absorbed and metabolized. With population pharmacokinetic models, variations within and between populations can be assessed. The CDISC ADaM Population PK Analysis Data Implementation Guide was released on October 6, 2023. (<https://www.cdisc.org/standards/foundational/adam/basic-data-structure-adam-poppk-implementation-guide-v1-0>)
 
-Population PK models generally make use of nonlinear mixed effects models that require numeric variables. The data used in the models will include both dosing and concentration records, relative time variables, and numeric covariate variables. A DV or dependent variable is often expected, typically the concentration. This is equivalent to the ADaM AVAL variable and will be included in addition to AVAL for ADPPK. The relative time variables are listed in the table below. Also below are the expected variables unique to ADPPK and examples of the numeric covariates. ADPPK follows the CDISC BDS ("Basic Data Structure") format.
+ADPPK follows the CDISC BDS ("Basic Data Structure") format. Population PK models generally make use of nonlinear mixed effects models that require numeric variables. The data used in the models will include both dosing and concentration records, relative time variables, and numeric covariate variables. A DV or dependent variable is often expected, typically the concentration. This is equivalent to the ADaM AVAL variable and will be included in addition to AVAL for ADPPK. The relative time variables include nominal (planned) and actual time and are listed in the table below. The relative time variables include the "RLT" naming convention to distinguish them from the other CDISC date and time variables. Also below are the expected variables unique to ADPPK and examples of the numeric covariates.
 
 ## Time Variables (`ADPPK`)
 
@@ -46,7 +46,7 @@ These variables are expected in `ADPPK`:
 These are the conventions for the numeric covariates:
 
 | Covariate  | Covariate Example                                                |
-|------------------|------------------------------------------------------|
+|-------------------|-----------------------------------------------------|
 | `<COV>BL`  | Baseline covariate, (e.g., `WTBL`, `BMIBL`)                      |
 | `<COV>N`   | Numeric version of categorical covariate (e.g., `SEXN`, `RACEN`) |
 | `<COV>I`   | Covariates with imputed values (e.g., `WTI`, `BMII`)             |
@@ -116,7 +116,7 @@ print_df <- function(dataset, display_vars = NULL) {
 
 ## Load Specifications for `{metacore}`
 
-There is a sample specification file for ADPPK which can be loaded into `{metacore}`. The file is loaded into `{metacore}` with the `metacore::spec_to_metacore()` function. The spec file can be found [here](https://github.com/pharmaverse/examples/blob/main/adam/pk_spec.xlsx){target="_blank"}.
+There is a sample specification file for ADPPK which can be loaded into `{metacore}`. The file is loaded into `{metacore}` with the `metacore::spec_to_metacore()` function. The spec file can be found [here](https://github.com/pharmaverse/examples/blob/main/adam/pk_spec.xlsx){target="_blank"} in the Pharmaverse Examples website <https://pharmaverse.github.io/examples/adam/adppk.html>.
 
 ```{r echo=TRUE, message=FALSE}
 #| label: Load Specs
@@ -364,7 +364,7 @@ adppk_xpt <- adppk %>%
 
 # Conclusions
 
-Analysis data standards for Population PK (ADPPK) have been recently released. Within a few years submissions to regulatory agencies such as the FDA may require submissions of ADPPK analysis data. As we begin to see submissions programmed in R the use of packages such as `{admiral}` will become more widespread. The code presented here shows that `{admiral}` and other Pharmaverse packages provide an excellent way to program ADPPK analysis data.
+Analysis data standards for Population PK (ADPPK) have been recently released. Within a few years submissions to regulatory agencies such as the FDA may require submissions of ADPPK analysis data. As we begin to see submissions programmed in R the use of open-source packages such as `{admiral}` will become more widespread. The code presented here shows that `{admiral}` and other Pharmaverse packages provide an excellent way to program ADPPK analysis data.
 
 Be sure to check out the Pharmaverse Examples website and try the code on Posit Cloud!
 
