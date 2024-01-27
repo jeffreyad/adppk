@@ -283,3 +283,6 @@ xportr
 XPORTR
 xpt
 XPT
+adnca
+BDS
+ExamplesQR
