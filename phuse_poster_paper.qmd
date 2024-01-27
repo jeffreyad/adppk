@@ -1,0 +1,387 @@
+---
+title: "Population Pharmacokinetic Analysis Data (ADPPK) Programming in `{admiral}` and the Pharmaverse"
+author: "Jeffrey Dickinson, Navitas Data Sciences, Pottstown, PA, USA"
+format:
+  docx:
+    toc: false
+    header: "Paper PP01"
+    number-sections: false
+    colorlinks: true
+---
+
+# Abstract
+
+Population Pharmacokinetic modeling is an important tool for drug development. The CDISC ADaM Population PK Implementation Guide was released on October 6, 2023. Population PK models generally make use of nonlinear mixed effects models that require numeric variables. The data used in the models will include both dosing and concentration records, relative time variables, and numeric covariate variables. `{admiral}` is an open-source R package for creating CDISC ADaM data. It can be used effectively to create Population PK analysis data (ADPPK). Additional tools from other Pharmaverse packages such as `{metacore}`, `{metatools}` and `{xportr}` can be used to simplify the workflow. I will discuss some of the challenges of Population Pharmacokinetic analysis data programming and show some of the solutions developed in `{admiral}` and the Pharmaverse.
+
+# Introduction
+
+Pharmacokinetics considers the effect of the body on a drug. Typically samples are drawn at set time intervals after dose administration. The resulting concentration profiles can be analyzed to see how the drug is absorbed and metabolized. With population pharmacokinetic models, variations within and between populations can be assessed. The CDISC ADaM Population PK Analysis Data Implementation Guide was released on October 6, 2023. (<https://www.cdisc.org/standards/foundational/adam/basic-data-structure-adam-poppk-implementation-guide-v1-0>)
+
+ADPPK follows the CDISC BDS ("Basic Data Structure") format. Population PK models generally make use of nonlinear mixed effects models that require numeric variables. The data used in the models will include both dosing and concentration records, relative time variables, and numeric covariate variables. A DV or dependent variable is often expected, typically the concentration. This is equivalent to the ADaM AVAL variable and will be included in addition to AVAL for ADPPK. The relative time variables include nominal (planned) and actual time and are listed in the table below. The relative time variables include the "RLT" naming convention to distinguish them from the other CDISC date and time variables. Also below are the expected variables unique to ADPPK and examples of the numeric covariates.
+
+## Time Variables (`ADPPK`)
+
+These are the names for the relative time variables:
+
+| Variable | Variable Label                      |
+|----------|-------------------------------------|
+| `NFRLT`  | Nominal Rel Time from First Dose    |
+| `AFRLT`  | Actual Rel Time from First Dose     |
+| `NPRLT`  | Nominal Rel Time from Previous Dose |
+| `APRLT`  | Actual Rel Time from Previous Dose  |
+
+## Expected Variables (`ADPPK`)
+
+These variables are expected in `ADPPK`:
+
+| Variable  | Variable Label                  |
+|-----------|---------------------------------|
+| `EVID`    | Event ID                        |
+| `DV`      | Dependent Variable              |
+| `MDV`     | Missing Dependent Variable      |
+| `BLQFL/N` | Below Lower Limit of Quant Flag |
+
+## `ADPPK` Covariates
+
+These are the conventions for the numeric covariates:
+
+| Covariate  | Covariate Example                                                |
+|-------------------|-----------------------------------------------------|
+| `<COV>BL`  | Baseline covariate, (e.g., `WTBL`, `BMIBL`)                      |
+| `<COV>N`   | Numeric version of categorical covariate (e.g., `SEXN`, `RACEN`) |
+| `<COV>I`   | Covariates with imputed values (e.g., `WTI`, `BMII`)             |
+| `<COV>GRy` | Grouping covariates (e.g. `AGEGR1`                               |
+
+# `{admiral}`
+
+`{admiral}` is an open-source R package for creating CDISC analysis datasets. It is modular and consists of a set of functions for many of the operations required for dataset construction. There are template programs available for most CDISC ADaM datasets including for PK (i.e. ADPPK, ADNCA and ADPP). See the `{admiral}` vignette for Creating a PK NCA or Population PK ADaM for more information [https://pharmaverse.github.io/admiral/articles/pk_adnca.html](https://pharmaverse.github.io/admiral/articles/pk_adnca.html){target="_blank"}. The `{admiral}` functions used for ADPPK are listed below:
+
+## `{admiral}` Functions Used
+
+-   `derive_vars_dtm()`
+-   `derive_vars_dtm_to_dt()`
+-   `derive_vars_dtm_to_tm()`
+-   `derive_vars_dy()`
+-   `derive_vars_duration()`
+-   `create_single_dose_dataset()`
+-   `derive_vars_merged()`
+-   `derive_vars_joined()`
+-   `derive_vars_transposed()`
+-   `compute_bmi()`
+-   `compute_bsa()`
+-   `compute_egfr()`
+
+## Pharmaverse
+
+In addition to `{admiral}` this poster will show several other packages from the Pharmaverse [https://pharmaverse.org/](https://pharmaverse.org/){target="_blank"}, which is collaborative effort across companies and people to create a curated set of packages for clinical reporting. I am using the following additional packages:
+
+-   `{pharmaversesdtm}` Sample CDISC SDTM data
+-   `{pharmaverseadam}` Sample CDISC analysis data
+-   `{metacore}` Create and manage metadata for the analysis data
+-   `{metatools}` Work with metadata to derive variables and perform checks
+-   `{xportr}` Perform checks on data and export to transport file
+
+# Programming Workflow.
+
+The complete programming workflow for building the ADPPK analysis dataset can be found on the Pharmaverse examples website [https://pharmaverse.github.io/examples/adam/adppk.html](https://pharmaverse.github.io/examples/adam/adppk.html){target="_blank"}. I will highlight the following steps here:
+
+-   Load Specs with `{metacore}`
+-   Derive PC Dates
+-   Expand Dosing Records
+-   Find First Dose
+-   Find Previous Dose
+-   Find Previous Nominal Dose
+-   Derive Covariates Using `{metacore}`
+-   `{metacore}` Checks
+-   `{xportr}` Steps
+
+```{r echo=FALSE, message=FALSE}
+#| label: Setup
+
+library(admiraldev)
+source("inst/templates/ad_adppk_spec.R")
+dir <- "./output"
+
+print_df <- function(dataset, display_vars = NULL) {
+  display_vars <- assert_vars(display_vars, optional = TRUE)
+  assert_data_frame(dataset, required_vars = display_vars)
+
+  out <- dataset %>%
+    select(!!!display_vars)
+
+
+  head(out, n = 20)
+}
+```
+
+## Load Specifications for `{metacore}`
+
+There is a sample specification file for ADPPK which can be loaded into `{metacore}`. The file is loaded into `{metacore}` with the `metacore::spec_to_metacore()` function. The spec file can be found [here](https://github.com/pharmaverse/examples/blob/main/adam/pk_spec.xlsx){target="_blank"} in the Pharmaverse Examples website <https://pharmaverse.github.io/examples/adam/adppk.html>.
+
+```{r echo=TRUE, message=FALSE}
+#| label: Load Specs
+#| warning: false
+# ---- Load Specs for Metacore ----
+metacore <- spec_to_metacore("pk_spec.xlsx") %>%
+  select_dataset("ADPPK")
+```
+
+## Derive PC Dates
+
+One of the first things done after loading the SDTM domains is to convert character dates to numeric. We will also combine some variables from `ADSL` at this step. Only the `ADSL` variables used for derivations are selected at this step. The rest of the relevant `ADSL` variables will be added later. In this case we will keep `TRTSDT`/`TRTSDTM` for day derivation and `TRT01P`/`TRT01A` for planned and actual treatments.
+
+In this segment we will use `admiral::derive_vars_merged()` to join the `ADSL` variables and the following `{admiral}` functions to derive analysis dates, times and days:
+
+-   `derive_vars_dtm()`
+-   `derive_vars_dtm_to_dt()`
+-   `derive_vars_dtm_to_tm()`
+-   `derive_vars_dy()`
+
+We will also create nominal time from first dose (`NFRLT)` for `PC` data based on `PCTPTNUM`. We will create an event ID (`EVID`) of 0 for concentration records and 1 for dosing records.
+
+```{r}
+#| label: PC Dates
+# ---- Derivations ----
+
+# Get list of ADSL vars required for derivations
+adsl_vars <- exprs(TRTSDT, TRTSDTM, TRT01P, TRT01A)
+
+pc_dates <- pc %>%
+  # Join ADSL with PC (need TRTSDT for ADY derivation)
+  derive_vars_merged(
+    dataset_add = adsl,
+    new_vars = adsl_vars,
+    by_vars = exprs(STUDYID, USUBJID)
+  ) %>%
+  # Derive analysis date/time
+  # Impute missing time to 00:00:00
+  derive_vars_dtm(
+    new_vars_prefix = "A",
+    dtc = PCDTC,
+    time_imputation = "00:00:00"
+  ) %>%
+  # Derive dates and times from date/times
+  derive_vars_dtm_to_dt(exprs(ADTM)) %>%
+  derive_vars_dtm_to_tm(exprs(ADTM)) %>%
+  # Derive event ID and nominal relative time from first dose (NFRLT)
+  mutate(
+    EVID = 0,
+    DRUG = PCTEST,
+    NFRLT = if_else(PCTPTNUM < 0, 0, PCTPTNUM), .after = USUBJID
+  )
+```
+
+## Expand Dosing Records
+
+The function `admiral::create_single_dose_dataset()` will be used to expand dosing records between the start date and end date. The nominal time will also be expanded based on the values of `EXDOSFRQ`, for example "QD" will result in nominal time being incremented by 24 hours and "BID" will result in nominal time being incremented by 12 hours.
+
+```{r}
+#| label: Expand
+# ---- Expand dosing records between start and end dates ----
+# Updated function includes nominal_time parameter
+
+ex_exp <- ex_dates %>%
+  create_single_dose_dataset(
+    dose_freq = EXDOSFRQ,
+    start_date = ASTDT,
+    start_datetime = ASTDTM,
+    end_date = AENDT,
+    end_datetime = AENDTM,
+    nominal_time = NFRLT,
+    lookup_table = dose_freq_lookup,
+    lookup_column = CDISC_VALUE,
+    keep_source_vars = exprs(
+      STUDYID, USUBJID, EVID, EXDOSFRQ, EXDOSFRM,
+      NFRLT, EXDOSE, EXDOSU, EXTRT, ASTDT, ASTDTM, AENDT, AENDTM,
+      VISIT, VISITNUM, VISITDY,
+      TRT01A, TRT01P, DOMAIN, EXSEQ, !!!adsl_vars
+    )
+  ) %>%
+  # Derive AVISIT based on nominal relative time
+  # Derive AVISITN to nominal time in whole days using integer division
+  # Define AVISIT based on nominal day
+  mutate(
+    AVISITN = NFRLT %/% 24 + 1,
+    AVISIT = paste("Day", AVISITN),
+    ADTM = ASTDTM,
+    DRUG = EXTRT
+  ) %>%
+  # Derive dates and times from datetimes
+  derive_vars_dtm_to_dt(exprs(ADTM)) %>%
+  derive_vars_dtm_to_tm(exprs(ADTM)) %>%
+  derive_vars_dtm_to_tm(exprs(ASTDTM)) %>%
+  derive_vars_dtm_to_tm(exprs(AENDTM))
+```
+
+## Find First Dose
+
+We find the first dose for the concentration records using the function `admiral::derive_vars_merged()`. Note that `mode = "first"` is used to select the first record by the order variables.
+
+```{r}
+#| label: First Dose
+# ---- Find first dose per treatment per subject ----
+# ---- Join with ADPPK data and keep only subjects with dosing ----
+
+adppk_first_dose <- pc_dates %>%
+  derive_vars_merged(
+    dataset_add = ex_exp,
+    filter_add = (!is.na(ADTM)),
+    new_vars = exprs(FANLDTM = ADTM, EXDOSE_first = EXDOSE),
+    order = exprs(ADTM, EXSEQ),
+    mode = "first",
+    by_vars = exprs(STUDYID, USUBJID, DRUG)
+  ) %>%
+  filter(!is.na(FANLDTM)) %>%
+  # Derive AVISIT based on nominal relative time
+  # Derive AVISITN to nominal time in whole days using integer division
+  # Define AVISIT based on nominal day
+  mutate(
+    AVISITN = NFRLT %/% 24 + 1,
+    AVISIT = paste("Day", AVISITN),
+  )
+```
+
+## Find Previous Dose
+
+For `ADPPK` we will find the previous dose with respect to actual time and nominal time. We will use `admiral::derive_vars_joined()`. In this case we use the `filter_join` parameter to select the last record before the date.
+
+```{r}
+#| label: Previous Dose
+# ---- Find previous dose  ----
+
+adppk_prev <- adppk_first_dose %>%
+  derive_vars_joined(
+    dataset_add = ex_exp,
+    by_vars = exprs(USUBJID),
+    order = exprs(ADTM),
+    new_vars = exprs(
+      ADTM_prev = ADTM, EXDOSE_prev = EXDOSE, AVISIT_prev = AVISIT,
+      AENDTM_prev = AENDTM
+    ),
+    join_vars = exprs(ADTM),
+    join_type = "all",
+    filter_add = NULL,
+    filter_join = ADTM > ADTM.join,
+    mode = "last",
+    check_type = "none"
+  )
+```
+
+## Find Previous Nominal Dose
+
+Here we also use `admiral::derive_vars_joined()` to also find the previous nominal dose.
+
+```{r}
+#| label: Previous Nominal Dose
+# ---- Find previous nominal dose ----
+
+adppk_nom_prev <- adppk_prev %>%
+  derive_vars_joined(
+    dataset_add = ex_exp,
+    by_vars = exprs(USUBJID),
+    order = exprs(NFRLT),
+    new_vars = exprs(NFRLT_prev = NFRLT),
+    join_type = "all",
+    join_vars = exprs(NFRLT),
+    filter_add = NULL,
+    filter_join = NFRLT > NFRLT.join,
+    mode = "last",
+    check_type = "none"
+  )
+```
+
+## Derive Covariates Using `{metacore}`
+
+In this step we will create our numeric covariates using the `metatools::create_var_from_codelist()` function.
+
+```{r}
+#| label: Covariates
+#---- Derive Covariates ----
+# Include numeric values for STUDYIDN, USUBJIDN, SEXN, RACEN etc.
+
+covar <- adsl %>%
+  create_var_from_codelist(metacore, input_var = STUDYID, out_var = STUDYIDN) %>%
+  create_var_from_codelist(metacore, input_var = SEX, out_var = SEXN) %>%
+  create_var_from_codelist(metacore, input_var = RACE, out_var = RACEN) %>%
+  create_var_from_codelist(metacore, input_var = ETHNIC, out_var = AETHNIC) %>%
+  create_var_from_codelist(metacore, input_var = AETHNIC, out_var = AETHNICN) %>%
+  create_var_from_codelist(metacore, input_var = ARMCD, out_var = COHORT) %>%
+  create_var_from_codelist(metacore, input_var = ARMCD, out_var = COHORTC) %>%
+  create_var_from_codelist(metacore, input_var = COUNTRY, out_var = COUNTRYN) %>%
+  create_var_from_codelist(metacore, input_var = COUNTRY, out_var = COUNTRYL) %>%
+  mutate(
+    STUDYIDN = as.numeric(word(USUBJID, 1, sep = fixed("-"))),
+    SITEIDN = as.numeric(word(USUBJID, 2, sep = fixed("-"))),
+    USUBJIDN = as.numeric(word(USUBJID, 3, sep = fixed("-"))),
+    SUBJIDN = as.numeric(SUBJID),
+    ROUTE = unique(ex$EXROUTE),
+    FORM = unique(ex$EXDOSFRM),
+    REGION1 = COUNTRY,
+    REGION1N = COUNTRYN,
+    SUBJTYPC = "Volunteer",
+  ) %>%
+  create_var_from_codelist(metacore, input_var = FORM, out_var = FORMN) %>%
+  create_var_from_codelist(metacore, input_var = ROUTE, out_var = ROUTEN) %>%
+  create_var_from_codelist(metacore, input_var = SUBJTYPC, out_var = SUBJTYP)
+```
+
+## Check Data With `{metacore}`
+
+We use `{metacore}` to perform a number of checks on the data. We will drop variables not in the specs and make sure all the variables from the specs are included.
+
+```{r}
+#| label: Metacore
+#| warning: false
+# Final Steps, Select final variables and Add labels
+# This process will be based on your metadata, no example given for this reason
+# ...
+# Apply metadata and perform associated checks ----
+# uses {metatools}
+
+adppk <- adppk_prefinal %>%
+  drop_unspec_vars(metacore) %>% # Drop unspecified variables from specs
+  check_variables(metacore) %>% # Check all variables specified are present
+  check_ct_data(metacore) %>% # Checks Control Terminology
+  order_cols(metacore) %>% # Orders the columns according to the spec
+  sort_by_key(metacore) # Sorts the rows by the sort keys
+```
+
+## Apply Labels and Formats with `{xportr}`
+
+Using `{xportr}` we check variable type, assign variable length, add variable labels, add variable formats, and save a transport file.
+
+```{r}
+#| label: xportr
+
+adppk_xpt <- adppk %>%
+  xportr_type(metacore) %>% # Coerce variable type to match spec
+  xportr_length(metacore) %>% # Assigns SAS length from a variable metadata
+  xportr_label(metacore) %>% # Assigns variable label from specifications
+  xportr_format(metacore) %>% # Assigns variable format from specifications
+  xportr_df_label(metacore) %>% # Assigns dataset label from specifications
+  xportr_write(file.path(dir, "adppk.xpt")) # Write xpt v5 transport file
+```
+
+# Conclusions
+
+Analysis data standards for Population PK (ADPPK) have been recently released. Within a few years submissions to regulatory agencies such as the FDA may require submissions of ADPPK analysis data. As we begin to see submissions programmed in R the use of open-source packages such as `{admiral}` will become more widespread. The code presented here shows that `{admiral}` and other Pharmaverse packages provide an excellent way to program ADPPK analysis data.
+
+Be sure to check out the Pharmaverse Examples website and try the code on Posit Cloud!
+
+[![](images/ExamplesQR.png){width="112"}](https://pharmaverse.github.io/examples/adam/adppk.html)
+
+# Contact Information
+
+Your comments and questions are valued and encouraged. Contact the author at:
+
+Author Name: Jeffrey Dickinson
+
+Company: Navitas Data Sciences
+
+Address: 1610 Medical Drive, Suite 300, Pottstown, PA 19464 USA
+
+Work Phone: +1 402 319 9380
+
+Email: jeff.dickinson\@navitaslifesciences.com
+
+Website: [www.navitaslifesciences.com](www.navitaslifesciences.com){target="_blank"}

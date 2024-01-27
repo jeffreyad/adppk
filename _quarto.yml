@@ -2,7 +2,7 @@ project:
   type: website
 
 website:
-  title: "End to End Examples for PK"
+  title: "POPPK in {admiral}"
   navbar:
     pinned: true
     collapse: false
@@ -13,7 +13,7 @@ website:
         href: https://app.slack.com/client/T028PB489D3/
         aria-label: Slack
       - icon: github
-        href: https://github.com/pharmaverse/e2e_pk
+        href: https://github.com/jeffreyad/adppk
         aria-label: Repository      
   sidebar:
     - id: sidebar
@@ -22,8 +22,11 @@ website:
       logo: images/pharmaverse.png
       border: true
       contents:
-      - adpc.qmd
       - adppk.qmd
+      - PK_programming_pharmaverse.qmd
+      - phuse_poster.qmd
+      - phuse_poster_pptx.qmd
+      - phuse_poster_paper.qmd
 
   favicon: images/pharmaverse-favicon.png
   

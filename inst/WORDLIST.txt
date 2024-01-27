@@ -75,6 +75,7 @@ CMAX
 CMT
 codelist
 COHORTC
+colorlinks
 COUNTRYL
 COUNTRYN
 COV
@@ -95,6 +96,7 @@ derviing
 df
 dickinson
 dir
+docx
 DOSEA
 DOSEP
 DOSEU
@@ -199,11 +201,14 @@ Pharmacokinetics
 Pharmavers
 pharmaverse
 Pharmaverse
+pharmaverseadam
 pharmaversesdtm
 PHUSE
 png
 poppk
 PopPK
+Pottstown
+pptx
 pre
 Pre
 prefinal
@@ -212,6 +217,7 @@ prev
 PROJID
 PROJIDN
 QD
+Quant
 RACEN
 rawdata
 Rawdata
@@ -247,6 +253,7 @@ timepoint
 Timepoint
 tm
 TMAX
+toc
 tribble
 TRT
 TRTSDT
@@ -276,3 +283,7 @@ xportr
 XPORTR
 xpt
 XPT
+adnca
+BDS
+ExamplesQR
+RLT

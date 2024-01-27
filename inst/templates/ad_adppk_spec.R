@@ -15,6 +15,7 @@ library(xportr)
 library(readr)
 
 library(pharmaversesdtm) # Contains example datasets from the CDISC pilot project or simulated
+library(pharmaverseadam) # Contains example adam datasets from the CDISC pilot project
 # ---- Load Specs for Metacore ----
 
 metacore <- suppressWarnings(spec_to_metacore("pk_spec.xlsx")) %>%
@@ -32,8 +33,7 @@ data("ex")
 data("vs")
 data("lb")
 
-data("admiral_adsl")
-adsl <- admiral_adsl
+data("adsl")
 
 ex <- convert_blanks_to_na(ex)
 pc <- convert_blanks_to_na(pc)
@@ -111,6 +111,13 @@ ex_dates <- ex %>%
 # ---- Expand dosing records between start and end dates ----
 # Updated function includes nominal_time parameter
 
+ex_vars <- exprs(
+  STUDYID, USUBJID, EVID, EXDOSFRQ, EXDOSFRM,
+  NFRLT, EXDOSE, EXDOSU, EXTRT, ASTDT, ASTDTM, AENDT, AENDTM,
+  VISIT, VISITNUM, VISITDY, TRT01A, TRT01P, DOMAIN, EXSEQ,
+  !!!adsl_vars
+)
+
 ex_exp <- ex_dates %>%
   create_single_dose_dataset(
     dose_freq = EXDOSFRQ,
@@ -121,12 +128,7 @@ ex_exp <- ex_dates %>%
     nominal_time = NFRLT,
     lookup_table = dose_freq_lookup,
     lookup_column = CDISC_VALUE,
-    keep_source_vars = exprs(
-      STUDYID, USUBJID, EVID, EXDOSFRQ, EXDOSFRM,
-      NFRLT, EXDOSE, EXDOSU, EXTRT, ASTDT, ASTDTM, AENDT, AENDTM,
-      VISIT, VISITNUM, VISITDY,
-      TRT01A, TRT01P, DOMAIN, EXSEQ, !!!adsl_vars
-    )
+    keep_source_vars = ex_vars
   ) %>%
   # Derive AVISIT based on nominal relative time
   # Derive AVISITN to nominal time in whole days using integer division
@@ -174,7 +176,9 @@ adppk_prev <- adppk_first_dose %>%
     by_vars = exprs(USUBJID),
     order = exprs(ADTM),
     new_vars = exprs(
-      ADTM_prev = ADTM, EXDOSE_prev = EXDOSE, AVISIT_prev = AVISIT,
+      ADTM_prev = ADTM,
+      EXDOSE_prev = EXDOSE,
+      AVISIT_prev = AVISIT,
       AENDTM_prev = AENDTM
     ),
     join_vars = exprs(ADTM),
@@ -209,7 +213,7 @@ adppk_aprlt <- bind_rows(adppk_nom_prev, ex_exp) %>%
   mutate(
     FANLDTM = min(FANLDTM, na.rm = TRUE),
     min_NFRLT = min(NFRLT, na.rm = TRUE),
-    maxdate = max(ADT[EVID == 0], na.rm = TRUE), .after = USUBJID
+    maxdate = max(ADT[EVID == 0], na.rm = TRUE)
   ) %>%
   arrange(USUBJID, ADTM) %>%
   ungroup() %>%
