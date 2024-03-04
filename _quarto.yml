@@ -19,7 +19,7 @@ website:
     - id: sidebar
       style: docked
       collapse-level: 1
-      logo: images/pharmaverse.png
+      logo: images/pharmaverse_examples.png
       border: true
       contents:
       - adppk.qmd
@@ -27,6 +27,9 @@ website:
       - phuse_poster.qmd
       - phuse_poster_pptx.qmd
       - phuse_poster_paper.qmd
+      - text: Pharmaverse Home
+        href: https://pharmaverse.org/
+      
 
   favicon: images/pharmaverse-favicon.png
   
