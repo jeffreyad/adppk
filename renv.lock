@@ -104,14 +104,9 @@
     },
     "admiral": {
       "Package": "admiral",
-      "Version": "1.0.0",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteRepo": "admiral",
-      "RemoteUsername": "pharmaverse",
-      "RemoteRef": "HEAD",
-      "RemoteSha": "37c4dca453838f2e984530be1ad1d9af40db4679",
+      "Version": "1.0.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "admiraldev",
@@ -126,7 +121,7 @@
         "tidyr",
         "tidyselect"
       ],
-      "Hash": "34458fa9e75f446796725204a29cf823"
+      "Hash": "b257a10edcd3f1f5f4fcbf621134b052"
     },
     "admiraldev": {
       "Package": "admiraldev",
@@ -644,20 +639,25 @@
       ],
       "Hash": "18e9c28c1d3ca1560ce30658b22ce104"
     },
-    "pharmaversesdtm": {
-      "Package": "pharmaversesdtm",
-      "Version": "0.1.0",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteRepo": "pharmaversesdtm",
-      "RemoteUsername": "pharmaverse",
-      "RemoteRef": "HEAD",
-      "RemoteSha": "337133b9473f8e6e6d99bcfa88cb269c7692efc1",
+    "pharmaverseadam": {
+      "Package": "pharmaverseadam",
+      "Version": "0.2.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
       "Requirements": [
         "R"
       ],
-      "Hash": "0bc6e047b57afa28a40c0849bc693152"
+      "Hash": "83a61452b17515df080978b6133f80ef"
+    },
+    "pharmaversesdtm": {
+      "Package": "pharmaversesdtm",
+      "Version": "0.2.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "23d87e0c10d93fab66cb03602fffd5a3"
     },
     "pillar": {
       "Package": "pillar",
