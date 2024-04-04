@@ -31,5 +31,9 @@ iso_3166_alpha3 <- tibble(
   )
 )
 
+# Convert ISO 3166 alpha 3 country codes to numbers 1-249
+iso_3166_alpha3$country_number <- seq_len(nrow(iso_3166_alpha3))
+
 # Print the tibble
 print(iso_3166_alpha3)
+
