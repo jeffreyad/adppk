@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.3.1",
+    "Version": "4.3.3",
     "Repositories": [
       {
         "Name": "REPO_NAME",
@@ -644,6 +644,16 @@
       ],
       "Hash": "18e9c28c1d3ca1560ce30658b22ce104"
     },
+    "pharmaverseadam": {
+      "Package": "pharmaverseadam",
+      "Version": "1.0.0",
+      "Source": "Repository",
+      "Repository": "REPO_NAME",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "833cec06343b35f948c9b5c93aee1389"
+    },
     "pharmaversesdtm": {
       "Package": "pharmaversesdtm",
       "Version": "0.1.0",
@@ -778,13 +788,13 @@
     },
     "renv": {
       "Package": "renv",
-      "Version": "1.0.0",
+      "Version": "1.0.7",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
         "utils"
       ],
-      "Hash": "c321cd99d56443dbffd1c9e673c0c1a2"
+      "Hash": "397b7b2a265bc5a7a06852524dabae20"
     },
     "rlang": {
       "Package": "rlang",
@@ -820,6 +830,16 @@
         "yaml"
       ],
       "Hash": "79f14e53725f28900d936f692bfdd69f"
+    },
+    "rprojroot": {
+      "Package": "rprojroot",
+      "Version": "2.0.4",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "4c8415e0ec1e29f3f4f6fc108bef0144"
     },
     "sass": {
       "Package": "sass",
